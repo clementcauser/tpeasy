@@ -1,8 +1,18 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import ROUTES from "./constants/routes";
 import { prisma } from "./db/prisma";
+import { User } from "@prisma/client";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      companyId?: string | null;
+    } & DefaultSession["user"];
+  }
+}
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -10,21 +20,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
   adapter: PrismaAdapter(prisma),
   callbacks: {
-    async signIn() {
-      return true;
-    },
-    async session({ session }) {
-      // session.user.id = user.id;
+    async session({ session, token }) {
+      session.user.id = (token.user as User).id;
+      session.user.companyId = (token.user as User).companyId;
+
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        return { ...token, user };
+      } else {
+        return token;
       }
-      return token;
     },
-    async redirect({ baseUrl }) {
-      return baseUrl;
+    async redirect() {
+      return ROUTES.dashboard;
     },
   },
   providers: [

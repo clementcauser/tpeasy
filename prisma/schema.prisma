@@ -19,9 +19,12 @@ model User {
   // Optional for WebAuthn support
   authenticator Authenticator[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  profile   Profile[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+  role      Role     @default(EMPLOYEE)
 
   @@map("users")
 }
@@ -86,14 +89,28 @@ model Authenticator {
   @@map("authenticators")
 }
 
-model Profile {
-  id        String   @id @default(cuid())
-  firstName String?
-  lastName  String?
-  userId    String   @unique @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Company {
+  id             String  @id @default(cuid())
+  commercialName String
+  siren          String  @unique
+  siret          String  @unique
+  category       String?
+  activityCode   String  @unique
+  address        String
+  mainPhone      String
+  secondaryPhone String?
+  currency       String
+  capital        String
+
+  users User[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@map("profiles")
+  @@map("company")
+}
+
+enum Role {
+  OWNER
+  EMPLOYEE
 }
