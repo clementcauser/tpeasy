@@ -14,17 +14,25 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  if (
-    req.auth &&
-    req.auth.user.companyId === null &&
-    ![ROUTES["create-company"]].includes(req.nextUrl.pathname)
-  ) {
-    const createCompanyURL = new URL(
-      ROUTES["create-company"],
-      req.nextUrl.origin
-    );
+  if (req.auth) {
+    if (
+      ![ROUTES["create-company"]].includes(req.nextUrl.pathname) &&
+      req.auth.user.companyId === null
+    ) {
+      const createCompanyURL = new URL(
+        ROUTES["create-company"],
+        req.nextUrl.origin
+      );
 
-    return NextResponse.redirect(createCompanyURL);
+      return NextResponse.redirect(createCompanyURL);
+    } else if (
+      !!req.auth.user?.companyId &&
+      [ROUTES["create-company"]].includes(req.nextUrl.pathname)
+    ) {
+      const newURL = new URL(ROUTES.dashboard, req.nextUrl.origin);
+
+      return NextResponse.redirect(newURL);
+    }
   }
 
   if (req.auth && [ROUTES.signin].includes(req.nextUrl.pathname)) {

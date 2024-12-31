@@ -1,6 +1,10 @@
+import { auth } from "@/lib/auth";
 import React from "react";
 
-function Page() {
+async function Page() {
+  const session = await auth();
+  console.log("🚀 ~ Page ~ session:", session);
+
   return <div>Page</div>;
 }
 

@@ -21,15 +21,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   callbacks: {
     async session({ session, token }) {
-      session.user.id = (token.user as User).id;
-      session.user.companyId = (token.user as User).companyId;
+      session.user.id = token.id as string;
+      session.user.companyId = token.companyId as string;
 
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        return { ...token, user };
+        return { ...token, id: user.id, companyId: (user as User).companyId };
       } else {
+        if (trigger === "update" && session?.companyId) {
+          token.companyId = session.companyId;
+        }
+
         return token;
       }
     },

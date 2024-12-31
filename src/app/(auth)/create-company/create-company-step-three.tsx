@@ -4,7 +4,7 @@ import { useCreateCompany } from "./create-company-context";
 import CreateCompanyFinalForm from "./create-company-final-form";
 
 function CreateCompanyStepThree() {
-  const { company } = useCreateCompany();
+  const { company, goPreviousStep } = useCreateCompany();
 
   return (
     <>
@@ -15,7 +15,12 @@ function CreateCompanyStepThree() {
         </p>
       </div>
 
-      {company && <CreateCompanyFinalForm company={company} />}
+      {company && (
+        <CreateCompanyFinalForm
+          company={company}
+          onPreviousClick={goPreviousStep}
+        />
+      )}
     </>
   );
 }

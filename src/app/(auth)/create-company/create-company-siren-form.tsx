@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
-import { IconLoader } from "@tabler/icons-react";
+import { IconLoader, IconSearch } from "@tabler/icons-react";
 import { useCreateCompany } from "./create-company-context";
 
 type FormValues = z.infer<typeof createCompanyFromSIRENSchema>;
@@ -64,7 +64,7 @@ export default function CreateCompanySIRENForm() {
           )}
         />
         <Button type="submit" disabled={isPending}>
-          Chercher mon entreprise{" "}
+          <IconSearch /> Chercher mon entreprise{" "}
           {isPending && <IconLoader className="animate-spin" />}
         </Button>
       </form>
