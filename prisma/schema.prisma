@@ -104,13 +104,39 @@ model Company {
 
   users User[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+  companyFeatures CompanyFeature[]
 
-  @@map("company")
+  @@map("companies")
 }
 
 enum Role {
   OWNER
   EMPLOYEE
+}
+
+model Feature {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+  companyFeatures CompanyFeature[]
+
+  @@map("features")
+}
+
+model CompanyFeature {
+  id        String  @id @default(cuid())
+  companyId String
+  featureId String
+  isActive  Boolean @default(false)
+
+  company Company @relation(fields: [companyId], references: [id])
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@unique([companyId, featureId])
+  @@map("company_features")
 }
