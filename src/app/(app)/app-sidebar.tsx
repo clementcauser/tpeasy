@@ -6,9 +6,11 @@ import ROUTES from "@/lib/constants/routes";
 import { cn } from "@/lib/utils";
 import {
   IconFileBarcode,
+  IconFileSpreadsheet,
   IconLayoutDashboard,
   IconSettings,
   IconUser,
+  IconUsers,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
@@ -16,27 +18,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
 
+const iconClassName =
+  "text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0";
+
 const links = [
   {
     label: "Tableau de bord",
     href: ROUTES.dashboard,
-    icon: (
-      <IconLayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
+    icon: <IconLayoutDashboard className={iconClassName} />,
+  },
+  {
+    label: "Devis",
+    href: ROUTES.quotes,
+    icon: <IconFileSpreadsheet className={iconClassName} />,
   },
   {
     label: "Factures",
     href: ROUTES.bills,
-    icon: (
-      <IconFileBarcode className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
+    icon: <IconFileBarcode className={iconClassName} />,
   },
   {
-    label: "Configuration",
-    href: ROUTES.settings,
-    icon: (
-      <IconSettings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
+    label: "Clients",
+    href: ROUTES.clients,
+    icon: <IconUsers className={iconClassName} />,
   },
 ];
 
@@ -63,6 +67,13 @@ export function AppSidebar({ children }: PropsWithChildren) {
             </div>
           </div>
           <div>
+            <SidebarLink
+              link={{
+                href: ROUTES.settings,
+                label: "Configuration",
+                icon: <IconSettings className={iconClassName} />,
+              }}
+            />
             {user?.name && user?.email && (
               <SidebarLink
                 link={{
@@ -85,7 +96,7 @@ export function AppSidebar({ children }: PropsWithChildren) {
           </div>
         </SidebarBody>
       </Sidebar>
-      <main className="bg-white w-full">{children}</main>
+      {children}
     </div>
   );
 }

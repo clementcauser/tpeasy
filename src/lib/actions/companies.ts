@@ -5,8 +5,9 @@ import { actionClient } from "../utils/actions";
 import {
   createCompanyFromSIRENSchema,
   createCompanySchema,
+  getCurrentCompanySchema,
 } from "../validation/companies";
-import { createCompany } from "../db/companies";
+import { createCompany, getCurrentCompany } from "../db/companies";
 import { changeUserRole } from "../db/users";
 
 interface InfoLegales {
@@ -146,5 +147,17 @@ export const createCompanyAction = actionClient
       return res;
     } catch (error) {
       console.error(error);
+    }
+  });
+
+export const getCurrentCompanyAction = actionClient
+  .schema(getCurrentCompanySchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const company = await getCurrentCompany(parsedInput);
+
+      return company;
+    } catch (err) {
+      console.error(err);
     }
   });

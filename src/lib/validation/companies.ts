@@ -29,3 +29,8 @@ export const createCompanySchema = z.object({
     .length(10, "Doit comporter 10 chiffres")
     .nullable(),
 });
+
+export const getCurrentCompanySchema = z.object({
+  userId: z.string().cuid(),
+  companyId: z.string().cuid(),
+});
