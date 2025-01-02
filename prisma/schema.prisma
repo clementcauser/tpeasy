@@ -129,10 +129,11 @@ model Feature {
 }
 
 model CompanyFeature {
-  id        String  @id @default(cuid())
-  companyId String
-  featureId String
-  isActive  Boolean @default(false)
+  id              String  @id @default(cuid())
+  companyId       String
+  featureId       String
+  isActive        Boolean @default(false)
+  authorizedRoles Role[]
 
   company Company @relation(fields: [companyId], references: [id])
   feature Feature @relation(fields: [featureId], references: [id])

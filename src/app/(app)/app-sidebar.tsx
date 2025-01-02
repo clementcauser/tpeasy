@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { useFeature } from "@/hooks/use-feature";
 import { APP_NAME } from "@/lib/constants/app";
 import ROUTES from "@/lib/constants/routes";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
@@ -21,34 +22,42 @@ import { PropsWithChildren, useState } from "react";
 const iconClassName =
   "text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0";
 
-const links = [
-  {
-    label: "Tableau de bord",
-    href: ROUTES.dashboard,
-    icon: <IconLayoutDashboard className={iconClassName} />,
-  },
-  {
-    label: "Devis",
-    href: ROUTES.quotes,
-    icon: <IconFileSpreadsheet className={iconClassName} />,
-  },
-  {
-    label: "Factures",
-    href: ROUTES.bills,
-    icon: <IconFileBarcode className={iconClassName} />,
-  },
-  {
-    label: "Clients",
-    href: ROUTES.clients,
-    icon: <IconUsers className={iconClassName} />,
-  },
-];
+interface Props {
+  session: Session | null;
+}
 
-export function AppSidebar({ children }: PropsWithChildren) {
+export function AppSidebar({ children, session }: PropsWithChildren<Props>) {
   const [open, setOpen] = useState(false);
-  const { data: session } = useSession();
 
   const user = session?.user;
+  const { hasFeature } = useFeature();
+
+  const links = [
+    {
+      label: "Tableau de bord",
+      href: ROUTES.dashboard,
+      icon: <IconLayoutDashboard className={iconClassName} />,
+      isVisible: true,
+    },
+    {
+      label: "Devis",
+      href: ROUTES.quotes,
+      icon: <IconFileSpreadsheet className={iconClassName} />,
+      isVisible: hasFeature("quotes"),
+    },
+    {
+      label: "Factures",
+      href: ROUTES.bills,
+      icon: <IconFileBarcode className={iconClassName} />,
+      isVisible: hasFeature("bills"),
+    },
+    {
+      label: "Clients",
+      href: ROUTES.clients,
+      icon: <IconUsers className={iconClassName} />,
+      isVisible: hasFeature("clients"),
+    },
+  ].filter((link) => link.isVisible);
 
   return (
     <div
@@ -67,13 +76,15 @@ export function AppSidebar({ children }: PropsWithChildren) {
             </div>
           </div>
           <div>
-            <SidebarLink
-              link={{
-                href: ROUTES.settings,
-                label: "Configuration",
-                icon: <IconSettings className={iconClassName} />,
-              }}
-            />
+            {hasFeature("settings") && (
+              <SidebarLink
+                link={{
+                  href: ROUTES.settings,
+                  label: "Configuration",
+                  icon: <IconSettings className={iconClassName} />,
+                }}
+              />
+            )}
             {user?.name && user?.email && (
               <SidebarLink
                 link={{

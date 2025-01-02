@@ -3,13 +3,14 @@ import NextAuth, { DefaultSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import ROUTES from "./constants/routes";
 import { prisma } from "./db/prisma";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
       companyId?: string | null;
+      role: Role;
     } & DefaultSession["user"];
   }
 }
@@ -23,12 +24,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.user.companyId = token.companyId as string;
+      session.user.role = token.role as Role;
 
       return session;
     },
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        return { ...token, id: user.id, companyId: (user as User).companyId };
+        return {
+          ...token,
+          id: user.id,
+          companyId: (user as User).companyId,
+          role: (user as User).role,
+        };
       } else {
         if (trigger === "update" && session?.companyId) {
           token.companyId = session.companyId;

@@ -24,6 +24,6 @@ export async function getCurrentCompany(payload: GetCurrentCompanyPayload) {
       id: payload.companyId,
       AND: { users: { some: { id: payload.userId } } },
     },
-    include: { companyFeatures: true },
+    include: { companyFeatures: { include: { feature: true } } },
   });
 }

@@ -1,15 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import { Feature, PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
+
+// WARNING -> THIS ARRAY MUST BE UP TO DATE WITH @/lib/constants/features
+export const FEATURES = [
+  { name: "bills", authorizedRoles: [Role.EMPLOYEE, Role.OWNER] },
+  { name: "quotes", authorizedRoles: [Role.EMPLOYEE, Role.OWNER] },
+  { name: "clients", authorizedRoles: [Role.EMPLOYEE, Role.OWNER] },
+  { name: "settings", authorizedRoles: [Role.OWNER] },
+];
 
 async function main() {
   // create features
-  const billsFeature = await prisma.feature.create({ data: { name: "bills" } });
-  const quotesFeature = await prisma.feature.create({
-    data: { name: "quotes" },
-  });
-  const clientsFeature = await prisma.feature.create({
-    data: { name: "clients" },
-  });
+  const generatedFeatures = await Promise.all(
+    FEATURES.map((feat) => prisma.feature.create({ data: { name: feat.name } }))
+  );
 
   // create test user
   const user = await prisma.user.create({
@@ -40,30 +44,26 @@ async function main() {
     data: { companyId: company.id },
   });
 
-  // zc bills feature
-  await prisma.companyFeature.create({
-    data: { companyId: company.id, featureId: billsFeature.id, isActive: true },
-  });
+  const check = (feature: Feature) => {
+    const found = FEATURES.find((f) => f.name === feature.name);
 
-  // authorize quotes features
-  await prisma.companyFeature.create({
-    data: {
-      companyId: company.id,
-      featureId: quotesFeature.id,
-      isActive: true,
-    },
-  });
+    return found?.authorizedRoles ?? [];
+  };
 
-  // deny clients features
-  await prisma.companyFeature.create({
-    data: {
-      companyId: company.id,
-      featureId: clientsFeature.id,
-      isActive: false,
-    },
-  });
+  Promise.all(
+    generatedFeatures.map((feat) =>
+      prisma.companyFeature.create({
+        data: {
+          companyId: company.id,
+          featureId: feat.id,
+          isActive: true,
+          authorizedRoles: check(feat),
+        },
+      })
+    )
+  );
 
-  console.log("Les fixtures ont été ajoutées avec succès.");
+  console.log("✅ Les fixtures ont été ajoutées avec succès.");
 }
 
 main()
