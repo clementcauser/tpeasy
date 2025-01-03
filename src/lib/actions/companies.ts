@@ -114,6 +114,9 @@ const mapResponseIntoCompany = (
     activityCode: response?.infolegales?.nafrcs,
     currency: response?.infolegales?.libdevise,
     capital: response?.infolegales?.capital,
+    legalForm: response?.infolegales?.catjurlibrcs,
+    taxId: response?.infolegales?.numtva,
+    rcs: response?.infolegales?.rcs,
   };
 };
 
@@ -130,6 +133,8 @@ export const createCompanyFromSIRENAction = actionClient
       return mapResponseIntoCompany(json);
     } catch (error) {
       console.error("Erreur lors de la récupération des données :", error);
+
+      throw Error(error as string);
     }
   });
 
@@ -159,5 +164,7 @@ export const getCurrentCompanyAction = actionClient
       return company;
     } catch (err) {
       console.error(err);
+
+      throw Error(err as string);
     }
   });

@@ -24,9 +24,18 @@ type BreadcrumbItem = {
   name: string;
 };
 
+type Action =
+  | {
+      type: "link";
+      href: ValueOf<typeof ROUTES>;
+      label: string;
+      icon: ReactNode;
+    }
+  | { type: "component"; component: ReactNode; label: string };
+
 interface Props {
   title: string;
-  action?: { href: ValueOf<typeof ROUTES>; label: string; icon: ReactNode };
+  action?: Action;
   breadcrumb: BreadcrumbItem[];
 }
 
@@ -37,7 +46,7 @@ export default function AppPageLayout({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <>
+    <div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
@@ -65,12 +74,17 @@ export default function AppPageLayout({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button asChild>
-                  <Link href={action.href}>
-                    {action?.icon}{" "}
-                    <span className="hidden md:block">{action.label}</span>
-                  </Link>
-                </Button>
+                <div>
+                  {action.type === "link" && (
+                    <Button asChild>
+                      <Link href={action.href}>
+                        {action?.icon}{" "}
+                        <span className="hidden md:block">{action.label}</span>
+                      </Link>
+                    </Button>
+                  )}
+                  {action.type === "component" && action.component}
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>{action.label}</p>
@@ -80,6 +94,6 @@ export default function AppPageLayout({
         )}
       </div>
       {children}
-    </>
+    </div>
   );
 }

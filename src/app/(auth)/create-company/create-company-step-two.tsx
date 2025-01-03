@@ -28,6 +28,9 @@ const buildTable = (company: LightCompany) => {
     currency: "Devise",
     siren: "SIREN",
     siret: "SIRET",
+    legalForm: "Forme juridique",
+    rcs: "Numéro RCS",
+    taxId: "Numéro TVA intracommunautaire",
   };
 
   const array = Object.keys(company);

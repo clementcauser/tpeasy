@@ -22,9 +22,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
-  role      Role     @default(EMPLOYEE)
+  company        Company? @relation(fields: [companyId], references: [id])
+  companyId      String?
+  role           Role     @default(EMPLOYEE)
+  createdClients Client[]
 
   @@map("users")
 }
@@ -101,12 +102,16 @@ model Company {
   secondaryPhone String?
   currency       String
   capital        String
+  legalForm      String
+  taxId          String
+  rcs            String
 
   users User[]
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @default(now()) @updatedAt
   companyFeatures CompanyFeature[]
+  clients         Client[]
 
   @@map("companies")
 }
@@ -140,4 +145,23 @@ model CompanyFeature {
 
   @@unique([companyId, featureId])
   @@map("company_features")
+}
+
+model Client {
+  id             String  @id @default(cuid())
+  name           String
+  address        String
+  mainPhone      String
+  secondaryPhone String?
+  email          String
+  companyId      String
+  createdById    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  createdBy User    @relation(fields: [createdById], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@map("clients")
 }

@@ -19,15 +19,21 @@ export const createCompanySchema = z.object({
   address: z.string(),
   currency: z.string(),
   capital: z.string(),
+  legalForm: z.string(),
+  taxId: z.string(),
+  rcs: z.string(),
   mainPhone: z
     .string()
-    .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide")
-    .length(10, "Doit comporter 10 chiffres"),
+    .min(1, "Champ obligatoire")
+    .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide"),
   secondaryPhone: z
     .string()
-    .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide")
-    .length(10, "Doit comporter 10 chiffres")
-    .nullable(),
+    .optional()
+    .or(
+      z
+        .string()
+        .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide")
+    ),
 });
 
 export const getCurrentCompanySchema = z.object({
