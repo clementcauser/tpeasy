@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   createClientSchema,
   deleteClientSchema,
+  getCompanyClientsCountSchema,
   getCompanyClientsSchema,
   updateClientSchema,
 } from "../validation/clients";
@@ -34,4 +35,12 @@ export const deleteClient = async (payload: DeleteClientPayload) => {
   return prisma.client.delete({
     where: { companyId: payload.companyId, id: payload.clientId },
   });
+};
+
+type GetCompanyClientsCount = z.infer<typeof getCompanyClientsCountSchema>;
+
+export const getCompanyClientsCount = async (
+  payload: GetCompanyClientsCount
+) => {
+  return prisma.client.count({ where: { companyId: payload.companyId } });
 };

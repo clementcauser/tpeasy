@@ -5,12 +5,14 @@ import {
   createClient,
   deleteClient,
   getCompanyClients,
+  getCompanyClientsCount,
   updateClient,
 } from "../db/clients";
 import { actionClient } from "../utils/actions";
 import {
   createClientSchema,
   deleteClientSchema,
+  getCompanyClientsCountSchema,
   getCompanyClientsSchema,
   updateClientSchema,
 } from "../validation/clients";
@@ -71,6 +73,18 @@ export const deleteClientAction = actionClient
       revalidatePath(ROUTES.clients);
 
       return deleted;
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const getCompanyClientsCountAction = actionClient
+  .schema(getCompanyClientsCountSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      return getCompanyClientsCount(parsedInput);
     } catch (error) {
       console.error(error);
 

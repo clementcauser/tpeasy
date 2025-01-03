@@ -49,3 +49,7 @@ export const deleteClientSchema = z.object({
   clientId: z.string().cuid(),
   companyId: z.string().cuid(),
 });
+
+export const getCompanyClientsCountSchema = z.object({
+  companyId: z.string().cuid(),
+});
