@@ -115,6 +115,7 @@ model Company {
   companyFeatures CompanyFeature[]
   clients         Client[]
   quoteRows       QuoteRow[]
+  quotes          Quote[]
 
   @@map("companies")
 }
@@ -202,6 +203,8 @@ model Quote {
   createdById String
   createdBy   User       @relation(fields: [createdById], references: [id])
   rows        QuoteRow[]
+  company     Company?   @relation(fields: [companyId], references: [id])
+  companyId   String?
 
   @@map("quotes")
 }

@@ -3,6 +3,7 @@ import { prisma } from "./prisma";
 import {
   createQuoteRowSchema,
   createQuoteSchema,
+  getAllCompanyQuotesSchema,
   getAllQuoteRowsByCompanySchema,
 } from "../validation/quotes";
 
@@ -30,4 +31,10 @@ export async function getAllQuoteRowsByCompany(
   payload: GetAllQuoteRowsByCompanyPayload
 ) {
   return prisma.quoteRow.findMany({ where: { companyId: payload.companyId } });
+}
+
+type GetAllCompanyQuotes = z.infer<typeof getAllCompanyQuotesSchema>;
+
+export async function getAllCompanyQuotes(payload: GetAllCompanyQuotes) {
+  return prisma.quote.findMany({ where: { companyId: payload.companyId } });
 }

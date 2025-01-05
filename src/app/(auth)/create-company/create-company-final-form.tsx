@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -51,6 +52,8 @@ export default function CreateCompanyFinalForm({
     },
   });
 
+  console.log(form.formState.errors);
+
   const { execute, isPending } = useAction(createCompanyAction, {
     onSuccess: async (result) => {
       const companyId = result?.data?.id;
@@ -61,6 +64,7 @@ export default function CreateCompanyFinalForm({
         title: "Félicitations !",
         description: "Votre entreprise a été créée avec succès !",
       });
+
       push(ROUTES.dashboard);
     },
     onError: () =>
@@ -82,6 +86,23 @@ export default function CreateCompanyFinalForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
+        <FormField
+          control={form.control}
+          name="companyPrefix"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Préfixe *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="ABE, PSK, ..." />
+              </FormControl>
+              <FormDescription>
+                Il s&apos;agit du trigramme qui apparaîtra dans les numéros de
+                devis ou de factures.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="mainPhone"

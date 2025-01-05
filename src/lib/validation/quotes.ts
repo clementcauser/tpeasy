@@ -26,4 +26,9 @@ export const createQuoteSchema = z.object({
   status: z.nativeEnum(QuoteStatus).default(QuoteStatus.PENDING),
   clientId: z.string().cuid(),
   createdById: z.string().cuid(),
+  companyId: z.string().cuid(),
+});
+
+export const getAllCompanyQuotesSchema = z.object({
+  companyId: z.string().cuid(),
 });
