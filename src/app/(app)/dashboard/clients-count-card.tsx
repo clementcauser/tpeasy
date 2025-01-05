@@ -47,7 +47,6 @@ export function ClientsCountCardLoading() {
       <CardHeader>
         <CardTitle className="flex flex-col items-center gap-1">
           <Skeleton className="w-full h-6" />
-          <Skeleton className="w-1/2 h-6" />
         </CardTitle>
       </CardHeader>
       <CardContent className="flex justify-center items-center p-2">

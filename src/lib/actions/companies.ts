@@ -6,8 +6,15 @@ import {
   createCompanyFromSIRENSchema,
   createCompanySchema,
   getCurrentCompanySchema,
+  updateCompanyGeneralInfosSchema,
+  updateCompanyLegalInfosSchema,
 } from "../validation/companies";
-import { createCompany, getCurrentCompany } from "../db/companies";
+import {
+  createCompany,
+  getCurrentCompany,
+  updateCompanyGeneralInfos,
+  updateCompanyLegalInfos,
+} from "../db/companies";
 import { changeUserRole } from "../db/users";
 
 interface InfoLegales {
@@ -100,7 +107,7 @@ interface ApiResponse {
 
 const mapResponseIntoCompany = (
   response: ApiResponse
-): Omit<Company, "id" | "createdAt" | "updatedAt"> => {
+): Omit<Company, "id" | "createdAt" | "updatedAt" | "companyPrefix"> => {
   return {
     address: `${response?.infolegales?.voieadressagercs}, ${response?.infolegales?.codepostalrcs} ${response?.infolegales?.villercs}, ${response?.infolegales?.paysrcs}`,
     mainPhone: "",
@@ -160,6 +167,34 @@ export const getCurrentCompanyAction = actionClient
   .action(async ({ parsedInput }) => {
     try {
       const company = await getCurrentCompany(parsedInput);
+
+      return company;
+    } catch (err) {
+      console.error(err);
+
+      throw Error(err as string);
+    }
+  });
+
+export const updateCompanyGeneralInfosAction = actionClient
+  .schema(updateCompanyGeneralInfosSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const company = await updateCompanyGeneralInfos(parsedInput);
+
+      return company;
+    } catch (err) {
+      console.error(err);
+
+      throw Error(err as string);
+    }
+  });
+
+export const updateCompanyLegalInfosAction = actionClient
+  .schema(updateCompanyLegalInfosSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const company = await updateCompanyLegalInfos(parsedInput);
 
       return company;
     } catch (err) {

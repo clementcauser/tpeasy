@@ -23,7 +23,10 @@ import { useRouter } from "next/navigation";
 import ROUTES from "@/lib/constants/routes";
 import { useToast } from "@/hooks/use-toast";
 
-type LightCompany = Omit<Company, "createdAt" | "updatedAt" | "id">;
+type LightCompany = Omit<
+  Company,
+  "createdAt" | "updatedAt" | "id" | "companyPrefix"
+>;
 type FormValues = z.infer<typeof createCompanySchema>;
 
 interface Props {

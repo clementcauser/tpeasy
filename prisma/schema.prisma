@@ -26,6 +26,7 @@ model User {
   companyId      String?
   role           Role     @default(EMPLOYEE)
   createdClients Client[]
+  createdQuotes  Quote[]
 
   @@map("users")
 }
@@ -93,6 +94,7 @@ model Authenticator {
 model Company {
   id             String  @id @default(cuid())
   commercialName String
+  companyPrefix  String?
   siren          String  @unique
   siret          String  @unique
   category       String?
@@ -112,6 +114,7 @@ model Company {
   updatedAt       DateTime         @default(now()) @updatedAt
   companyFeatures CompanyFeature[]
   clients         Client[]
+  quoteRows       QuoteRow[]
 
   @@map("companies")
 }
@@ -162,6 +165,63 @@ model Client {
 
   createdBy User    @relation(fields: [createdById], references: [id])
   company   Company @relation(fields: [companyId], references: [id])
+  quotes    Quote[]
 
   @@map("clients")
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum QuoteRowType {
+  SERVICE
+  PRODUCT
+}
+
+enum TaxRate {
+  TAX_20
+  TAX_10
+  TAX_5_5
+}
+
+model Quote {
+  id             String   @id @default(cuid())
+  referenceId    String   @unique
+  createdAt      DateTime @default(now())
+  expirationDate DateTime
+  comment        String?
+
+  status QuoteStatus @default(PENDING)
+
+  clientId    String
+  client      Client     @relation(fields: [clientId], references: [id])
+  createdById String
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  rows        QuoteRow[]
+
+  @@map("quotes")
+}
+
+model QuoteRow {
+  id        String  @id @default(cuid())
+  name      String
+  quantity  Float
+  unitPrice Float
+  taxRate   TaxRate @default(TAX_20)
+  totalET   Float // Exclude Tax (HT)
+  totalIT   Float // Include Tax (TTC)
+  total     Float
+
+  type QuoteRowType
+
+  quote     Quote   @relation(fields: [quoteId], references: [id])
+  quoteId   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+
+  @@map("quote_rows")
 }

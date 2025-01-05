@@ -15,12 +15,17 @@ import { Company } from "@prisma/client";
 
 type LightCompany = Omit<
   Company,
-  "id" | "mainPhone" | "secondaryPhone" | "createdAt" | "updatedAt"
+  | "id"
+  | "mainPhone"
+  | "secondaryPhone"
+  | "createdAt"
+  | "updatedAt"
+  | "companyPrefix"
 >;
 
 const buildTable = (company: LightCompany) => {
   const DICTIONNARY: Record<keyof LightCompany, string> = {
-    activityCode: "Code activité",
+    activityCode: "Code APE",
     address: "Adresse",
     capital: "Capital",
     category: "Catégorie",

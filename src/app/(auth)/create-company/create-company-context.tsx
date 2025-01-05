@@ -3,7 +3,10 @@
 import { Company } from "@prisma/client";
 import { createContext, ReactNode, useContext, useState } from "react";
 
-type LightCompany = Omit<Company, "id" | "createdAt" | "updatedAt">;
+type LightCompany = Omit<
+  Company,
+  "id" | "createdAt" | "updatedAt" | "companyPrefix"
+>;
 
 interface CreateCompanyContextType {
   company: LightCompany | null;

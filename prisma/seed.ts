@@ -24,6 +24,7 @@ async function main() {
   const company = await prisma.company.create({
     data: {
       commercialName: "TEST COMPANY",
+      companyPrefix: "TEC",
       siren: "792796459",
       siret: "79279645900016",
       category: "Formation",
@@ -65,6 +66,38 @@ async function main() {
       })
     )
   );
+
+  await prisma.client.createMany({
+    data: [
+      {
+        companyId: company.id,
+        address: "12 rue du test",
+        createdById: user.id,
+        name: "Client 1",
+        email: "client1@mail.com",
+        mainPhone: "0123456789",
+        secondaryPhone: "0987654321",
+      },
+      {
+        companyId: company.id,
+        address: "87 rue du test",
+        createdById: user.id,
+        name: "Client 2",
+        email: "client2@mail.com",
+        mainPhone: "0123456789",
+        secondaryPhone: "0987654321",
+      },
+      {
+        companyId: company.id,
+        address: "43 rue du test",
+        createdById: user.id,
+        name: "Client 3",
+        email: "client3@mail.com",
+        mainPhone: "0123456789",
+        secondaryPhone: "0987654321",
+      },
+    ],
+  });
 
   console.log("✅ Les fixtures ont été ajoutées avec succès.");
 }

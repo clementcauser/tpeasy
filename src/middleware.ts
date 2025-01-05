@@ -35,7 +35,7 @@ export default auth((req) => {
     }
   }
 
-  if (req.auth && [ROUTES.signin].includes(req.nextUrl.pathname)) {
+  if (req.auth && [ROUTES.signin, ROUTES.root].includes(req.nextUrl.pathname)) {
     const newURL = new URL(ROUTES.dashboard, req.nextUrl.origin);
 
     return NextResponse.redirect(newURL);

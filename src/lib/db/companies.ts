@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   createCompanySchema,
   getCurrentCompanySchema,
+  updateCompanyGeneralInfosSchema,
+  updateCompanyLegalInfosSchema,
 } from "../validation/companies";
 import { prisma } from "./prisma";
 
@@ -25,5 +27,35 @@ export async function getCurrentCompany(payload: GetCurrentCompanyPayload) {
       AND: { users: { some: { id: payload.userId } } },
     },
     include: { companyFeatures: { include: { feature: true } } },
+  });
+}
+
+type UpdateCompanyGeneralInfosPayload = z.infer<
+  typeof updateCompanyGeneralInfosSchema
+>;
+
+export async function updateCompanyGeneralInfos(
+  payload: UpdateCompanyGeneralInfosPayload
+) {
+  const { companyId, ...rest } = payload;
+
+  return prisma.company.update({
+    data: rest,
+    where: { id: companyId },
+  });
+}
+
+type UpdateCompanyLegalInfosPayload = z.infer<
+  typeof updateCompanyLegalInfosSchema
+>;
+
+export async function updateCompanyLegalInfos(
+  payload: UpdateCompanyLegalInfosPayload
+) {
+  const { companyId, ...rest } = payload;
+
+  return prisma.company.update({
+    data: rest,
+    where: { id: companyId },
   });
 }
