@@ -77,7 +77,11 @@ export default function CreateCompanyFinalForm({
   });
 
   async function onSubmit(values: FormValues) {
-    return execute({ ...values, userId: data?.user.id ?? "" });
+    return execute({
+      ...values,
+      userId: data?.user.id ?? "",
+      email: data?.user?.email ?? "",
+    });
   }
 
   return (

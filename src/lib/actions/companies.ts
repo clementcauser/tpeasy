@@ -107,7 +107,10 @@ interface ApiResponse {
 
 const mapResponseIntoCompany = (
   response: ApiResponse
-): Omit<Company, "id" | "createdAt" | "updatedAt" | "companyPrefix"> => {
+): Omit<
+  Company,
+  "id" | "createdAt" | "updatedAt" | "companyPrefix" | "email"
+> => {
   return {
     address: `${response?.infolegales?.voieadressagercs}, ${response?.infolegales?.codepostalrcs} ${response?.infolegales?.villercs}, ${response?.infolegales?.paysrcs}`,
     mainPhone: "",

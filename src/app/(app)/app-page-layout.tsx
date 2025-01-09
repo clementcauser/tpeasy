@@ -6,16 +6,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Fragment, PropsWithChildren, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import ROUTES from "@/lib/constants/routes";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import Link from "next/link";
+import { Fragment, PropsWithChildren, ReactNode } from "react";
 
 type ValueOf<T> = T[keyof T];
 
@@ -31,7 +25,7 @@ type Action =
       label: string;
       icon: ReactNode;
     }
-  | { type: "component"; component: ReactNode; label: string };
+  | { type: "component"; component: ReactNode };
 
 interface Props {
   title: string;
@@ -71,26 +65,17 @@ export default function AppPageLayout({
           )}
         </div>
         {action && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  {action.type === "link" && (
-                    <Button asChild>
-                      <Link href={action.href}>
-                        {action?.icon}{" "}
-                        <span className="hidden md:block">{action.label}</span>
-                      </Link>
-                    </Button>
-                  )}
-                  {action.type === "component" && action.component}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{action.label}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div>
+            {action.type === "link" && (
+              <Button asChild>
+                <Link href={action.href}>
+                  {action?.icon}{" "}
+                  <span className="hidden md:block">{action.label}</span>
+                </Link>
+              </Button>
+            )}
+            {action.type === "component" && action.component}
+          </div>
         )}
       </div>
       {children}

@@ -26,10 +26,11 @@ import { z } from "zod";
 type FormValues = z.infer<typeof updateCompanyGeneralInfosSchema>;
 
 const mapCompanyWithFeaturesIntoFormValues = (company: Company): FormValues => {
-  const { address, commercialName, id, mainPhone } = company;
+  const { address, commercialName, id, mainPhone, email } = company;
 
   return {
     address,
+    email,
     commercialName,
     mainPhone,
     companyId: id,
@@ -126,6 +127,20 @@ function Form() {
             </FormItem>
           )}
         />
+        <FormField
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Adresse email</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           name="address"
           control={form.control}

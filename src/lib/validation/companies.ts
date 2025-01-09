@@ -13,6 +13,7 @@ export const createCompanySchema = z.object({
   userId: z.string().cuid(),
   commercialName: z.string(),
   companyPrefix: z.string().optional().or(z.string().min(3)),
+  email: z.string().email(),
   siren: z.string(),
   siret: z.string(),
   category: z.string().nullable(),
@@ -44,6 +45,7 @@ export const getCurrentCompanySchema = z.object({
 
 export const updateCompanyGeneralInfosSchema = z.object({
   companyId: z.string().cuid(),
+  email: z.string().email(),
   commercialName: z.string(),
   companyPrefix: z.string().optional().or(z.string().min(3)),
   address: z.string(),

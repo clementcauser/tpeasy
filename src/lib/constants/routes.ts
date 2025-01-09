@@ -8,7 +8,7 @@ export type AppRoute =
   | "quotes"
   | "clients"
   | "createBills"
-  | "createQuotes";
+  | "quoteDetails";
 
 const ROUTES: Record<AppRoute, string> = {
   root: "/",
@@ -19,8 +19,8 @@ const ROUTES: Record<AppRoute, string> = {
   createBills: "/bills/create",
   settings: "/settings",
   quotes: "/quotes",
-  createQuotes: "/quotes/create",
   clients: "/clients",
+  quoteDetails: "/quotes/[quoteId]",
 };
 
 export const PUBLIC_ROUTES = [ROUTES.root, ROUTES.signin];

@@ -95,6 +95,7 @@ model Company {
   id             String  @id @default(cuid())
   commercialName String
   companyPrefix  String?
+  email          String
   siren          String  @unique
   siret          String  @unique
   category       String?
@@ -191,10 +192,13 @@ enum TaxRate {
 
 model Quote {
   id             String   @id @default(cuid())
+  title          String
   referenceId    String   @unique
   createdAt      DateTime @default(now())
   expirationDate DateTime
   comment        String?
+  totalET        Float    @default(0)
+  totalIT        Float    @default(0)
 
   status QuoteStatus @default(PENDING)
 
@@ -212,17 +216,18 @@ model Quote {
 model QuoteRow {
   id        String  @id @default(cuid())
   name      String
+  unit      String  @default("unités")
   quantity  Float
   unitPrice Float
   taxRate   TaxRate @default(TAX_20)
   totalET   Float // Exclude Tax (HT)
   totalIT   Float // Include Tax (TTC)
-  total     Float
+  order     Int     @default(0)
 
   type QuoteRowType
 
-  quote     Quote   @relation(fields: [quoteId], references: [id])
-  quoteId   String
+  quote     Quote?  @relation(fields: [quoteId], references: [id])
+  quoteId   String?
   company   Company @relation(fields: [companyId], references: [id])
   companyId String
 

@@ -24,6 +24,7 @@ async function main() {
   const company = await prisma.company.create({
     data: {
       commercialName: "TEST COMPANY",
+      email: user.email,
       companyPrefix: "TEC",
       siren: "792796459",
       siret: "79279645900016",

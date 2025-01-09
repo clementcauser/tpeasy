@@ -18,6 +18,7 @@ import {
   updateClientSchema,
 } from "@/lib/validation/clients";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Client } from "@prisma/client";
 import { IconLoader } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
@@ -38,13 +39,15 @@ const DEFAULT_VALUES: LightFormValues = {
 interface Props {
   defaultValues?: LightFormValues;
   clientId?: string;
-  onSubmitSuccess?: () => void;
+  onSubmitSuccess?: (client?: Client) => void;
+  fromQuoteCreationForm?: boolean;
 }
 
 export default function CreateClientForm({
   defaultValues = DEFAULT_VALUES,
   clientId,
   onSubmitSuccess,
+  fromQuoteCreationForm = false,
 }: Props) {
   const { toast } = useToast();
   const { company } = useCurrentCompany();
@@ -63,15 +66,15 @@ export default function CreateClientForm({
   const { execute, isPending } = useAction(
     clientId ? udpateClientAction : createClientAction,
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast({
           title: "C'est fait ✅",
           description: clientId
             ? "Le client a correctement été mis à jour"
             : "Le client a été créé avec succès !",
         });
-        if (clientId) {
-          onSubmitSuccess?.();
+        if (clientId || fromQuoteCreationForm) {
+          onSubmitSuccess?.(data?.data);
         } else {
           form.reset();
         }
@@ -100,7 +103,7 @@ export default function CreateClientForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom ou raison sociale</FormLabel>
+              <FormLabel>Nom ou raison sociale *</FormLabel>
               <FormControl>
                 <Input
                   type="text"

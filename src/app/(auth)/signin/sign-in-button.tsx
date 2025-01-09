@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/lib/utils/index";
 import { signIn } from "next-auth/react";
 
 interface Props {
@@ -16,7 +17,7 @@ export default function SignInButton({ provider, className }: Props) {
       onClick={() => signIn(provider)}
       className={cn(className)}
     >
-      Se connecter avec {provider}
+      Se connecter avec {capitalizeFirstLetter(provider)}
     </Button>
   );
 }
