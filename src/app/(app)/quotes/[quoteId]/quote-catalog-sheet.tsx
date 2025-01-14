@@ -1,24 +1,51 @@
+"use client";
+
+import { useExtendedQuoteContext } from "@/components/providers/quote-context";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { IconListDetails } from "@tabler/icons-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getAllCompanyQuoteRowsAction } from "@/lib/actions/quotes";
+import { QuoteRowType } from "@prisma/client";
+import { IconListDetails } from "@tabler/icons-react";
+import { useAction } from "next-safe-action/hooks";
+import { useEffect, useState } from "react";
+import QuoteCatalogRows from "./quote-catalog-rows";
 
 interface Props {
   companyId: string;
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
 }
 
 export default function QuoteCatalogSheet({ companyId }: Props) {
+  const { catalog } = useExtendedQuoteContext();
+  const [selectedTab, setSelectedTab] = useState<"services" | "products">(
+    "services"
+  );
+
+  const { execute, result, isPending } = useAction(
+    getAllCompanyQuoteRowsAction
+  );
+
+  useEffect(() => {
+    if (catalog.isOpen) {
+      if (selectedTab === "services") {
+        execute({ companyId, type: QuoteRowType.SERVICE });
+      } else {
+        execute({ companyId, type: QuoteRowType.PRODUCT });
+      }
+    }
+  }, [companyId, selectedTab, catalog.isOpen, execute]);
+
   return (
-    <Sheet>
+    <Sheet open={catalog.isOpen} onOpenChange={catalog.setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" type="button">
           <IconListDetails /> Voir catalogue
@@ -32,23 +59,36 @@ export default function QuoteCatalogSheet({ companyId }: Props) {
             vous avez besoin.
           </SheetDescription>
         </SheetHeader>
-        <Tabs className="mt-4 w-full">
+        <Tabs
+          className="mt-4 w-full"
+          value={selectedTab}
+          onValueChange={(tab) =>
+            setSelectedTab(tab as "services" | "products")
+          }
+        >
           <TabsList className="flex">
-            <TabsTrigger className="flex-1" value="services">
+            <TabsTrigger
+              disabled={isPending}
+              className="flex-1"
+              value="services"
+            >
               Services
             </TabsTrigger>
-            <TabsTrigger className="flex-1" value="products">
+            <TabsTrigger
+              disabled={isPending}
+              className="flex-1"
+              value="products"
+            >
               Produits
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="services">MES SERVICES</TabsContent>
-          <TabsContent value="products">MES PRODUITS</TabsContent>
+          <TabsContent value="services">
+            <QuoteCatalogRows isLoading={isPending} rows={result?.data ?? []} />
+          </TabsContent>
+          <TabsContent value="products">
+            <QuoteCatalogRows isLoading={isPending} rows={result?.data ?? []} />
+          </TabsContent>
         </Tabs>
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button className="mt-4">Fermer</Button>
-          </SheetClose>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

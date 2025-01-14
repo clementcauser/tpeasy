@@ -1,6 +1,9 @@
 "use client";
 
-import { QuoteFormValues } from "@/components/providers/quote-context";
+import {
+  QuoteFormValues,
+  useExtendedQuoteContext,
+} from "@/components/providers/quote-context";
 import { Button } from "@/components/ui/button";
 import {
   FormControl,
@@ -24,30 +27,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { capitalizeFirstLetter, getMoneyPrice } from "@/lib/utils/index";
-import { getQuoteTaxRateLabel, getQuoteTypeLabel } from "@/lib/utils/quotes";
+import {
+  getQuoteTaxRateLabel,
+  getQuoteTypeLabel,
+  getTaxRateValue,
+} from "@/lib/utils/quotes";
 import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
 import { IconBriefcase, IconPackage, IconTrash } from "@tabler/icons-react";
-import { ReactNode, useEffect } from "react";
-import { useFormContext } from "react-hook-form";
-
-const getRowTypeIcon = (type: QuoteRowType): ReactNode => {
-  const DICTIONNARY: Record<QuoteRowType, ReactNode> = {
-    [QuoteRowType.PRODUCT]: <IconPackage />,
-    [QuoteRowType.SERVICE]: <IconBriefcase />,
-  };
-
-  return DICTIONNARY[type];
-};
-
-const getTaxRateValue = (taxRate: TaxRate): number => {
-  const DICTIONNARY: Record<TaxRate, number> = {
-    [TaxRate.TAX_10]: 10,
-    [TaxRate.TAX_20]: 20,
-    [TaxRate.TAX_5_5]: 5.5,
-  };
-
-  return DICTIONNARY[taxRate];
-};
+import { ReactNode, useEffect, useMemo } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
 const getTotalET = (quantity: number, unitPrice: number) =>
   quantity * unitPrice;
@@ -57,6 +45,15 @@ const getTotalIT = (totalET: number, taxRate: number) => {
   const taxAmount = taxCoeff * totalET;
 
   return totalET + taxAmount;
+};
+
+export const getQuoteRowTypeIcon = (type: QuoteRowType): ReactNode => {
+  const DICTIONNARY: Record<QuoteRowType, ReactNode> = {
+    [QuoteRowType.PRODUCT]: <IconPackage />,
+    [QuoteRowType.SERVICE]: <IconBriefcase />,
+  };
+
+  return DICTIONNARY[type];
 };
 
 type Row = QuoteRow & {
@@ -69,35 +66,33 @@ interface Props {
 }
 
 export default function QuoteTableItem({ row, rowIndex }: Props) {
-  const { control, watch, setValue } = useFormContext<QuoteFormValues>();
+  const { register, control, setValue } = useFormContext<QuoteFormValues>();
+  const { removeRow } = useExtendedQuoteContext();
 
-  const [quantity, unitPrice, taxRate, rows] = watch([
-    `rows.${rowIndex}.quantity`,
-    `rows.${rowIndex}.unitPrice`,
-    `rows.${rowIndex}.taxRate`,
-    "rows",
-  ]);
+  const totalET = useWatch({ name: `rows.${rowIndex}.totalET`, control });
+  const totalIT = useWatch({ name: `rows.${rowIndex}.totalIT`, control });
+  const quantity = useWatch({ name: `rows.${rowIndex}.quantity`, control });
+  const unitPrice = useWatch({ name: `rows.${rowIndex}.unitPrice`, control });
+  const taxRate = useWatch({ name: `rows.${rowIndex}.taxRate`, control });
 
-  useEffect(() => {
+  const { updatedTotalET, updatedTotalIT } = useMemo(() => {
     const updatedTotalET = getTotalET(quantity, unitPrice);
     const updatedTotalIT = getTotalIT(updatedTotalET, getTaxRateValue(taxRate));
 
+    return { updatedTotalET, updatedTotalIT };
+  }, [quantity, unitPrice, taxRate]);
+
+  useEffect(() => {
     setValue(`rows.${rowIndex}.totalET`, updatedTotalET);
     setValue(`rows.${rowIndex}.totalIT`, updatedTotalIT);
-
-    const ET = rows.reduce((prev, curr) => prev + curr?.totalET, 0);
-    const IT = rows.reduce((prev, curr) => prev + curr?.totalIT, 0);
-
-    setValue("totalET", ET);
-    setValue("totalIT", IT);
-  }, [quantity, unitPrice, taxRate, rows, setValue, rowIndex]);
+  }, [updatedTotalET, updatedTotalIT, setValue, rowIndex]);
 
   return (
     <TableRow>
       <TableCell className="pl-3">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>{getRowTypeIcon(row.type)}</TooltipTrigger>
+            <TooltipTrigger>{getQuoteRowTypeIcon(row.type)}</TooltipTrigger>
             <TooltipContent>
               <p>{capitalizeFirstLetter(getQuoteTypeLabel(row.type))}</p>
             </TooltipContent>
@@ -105,71 +100,39 @@ export default function QuoteTableItem({ row, rowIndex }: Props) {
         </TooltipProvider>
       </TableCell>
       <TableCell>
-        <FormField
-          control={control}
-          name={`rows.${rowIndex}.name`}
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={`Nom du ${getQuoteTypeLabel(row.type)}`}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <Input
+          {...register(`rows.${rowIndex}.name`)}
+          placeholder={`Nom du ${getQuoteTypeLabel(row.type)}`}
         />
       </TableCell>
       <TableCell>
-        <FormField
-          control={control}
-          name={`rows.${rowIndex}.quantity`}
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  step={0.01}
-                  className="text-right"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <Input
+          {...register(`rows.${rowIndex}.quantity`, { valueAsNumber: true })}
+          type="number"
+          step={0.01}
+          className="text-right"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          {...register(`rows.${rowIndex}.unit`)}
+          step={0.01}
+          className="text-right"
         />
       </TableCell>
       <TableCell>
         <div className="flex items-center justify-end gap-1">
-          <FormField
-            control={control}
-            name={`rows.${rowIndex}.unitPrice`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    step={0.01}
-                    className="text-right"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <Input
+            {...register(`rows.${rowIndex}.unitPrice`, { valueAsNumber: true })}
+            type="number"
+            step={0.01}
+            className="text-right"
           />
           <span>€</span>
         </div>
       </TableCell>
       <TableCell>
-        <FormField
-          control={control}
-          name={`rows.${rowIndex}.totalET`}
-          render={({ field }) => (
-            <p className="text-right font-bold">{getMoneyPrice(field.value)}</p>
-          )}
-        />
+        <p className="text-right font-bold">{getMoneyPrice(totalET)}</p>
       </TableCell>
       <TableCell className="text-right">
         <FormField
@@ -197,25 +160,15 @@ export default function QuoteTableItem({ row, rowIndex }: Props) {
         />
       </TableCell>
       <TableCell>
-        <FormField
-          control={control}
-          name={`rows.${rowIndex}.totalIT`}
-          render={({ field }) => (
-            <p className="text-right font-bold">{getMoneyPrice(field.value)}</p>
-          )}
-        />
+        <p className="text-right font-bold">{getMoneyPrice(totalIT)}</p>
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end gap-2">
           <Button
+            type="button"
             variant="destructive"
             size="icon"
-            onClick={() => {
-              setValue(
-                "rows",
-                rows.filter((_, i) => i !== rowIndex)
-              );
-            }}
+            onClick={() => removeRow(rowIndex)}
           >
             <IconTrash />
           </Button>

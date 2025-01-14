@@ -1,13 +1,13 @@
 "use client";
 
-import { QuoteFormValues } from "@/components/providers/quote-context";
+import { useExtendedQuoteContext } from "@/components/providers/quote-context";
 import { Button } from "@/components/ui/button";
+import { capitalizeFirstLetter } from "@/lib/utils/index";
 import { getQuoteTypeLabel } from "@/lib/utils/quotes";
 import { createId } from "@paralleldrive/cuid2";
 import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
 import { IconBriefcase, IconPackage } from "@tabler/icons-react";
 import { ReactNode } from "react";
-import { useFormContext } from "react-hook-form";
 
 const getRowTypeIcon = (type: QuoteRowType): ReactNode => {
   const DICTIONNARY: Record<QuoteRowType, ReactNode> = {
@@ -37,14 +37,13 @@ export default function AddQuoteRowButton({
   rowsCount,
 }: Props) {
   const rowType = getQuoteTypeLabel(type);
-  const { setValue, watch } = useFormContext<QuoteFormValues>();
 
-  const rows = watch("rows");
+  const { addRow } = useExtendedQuoteContext();
 
   const DEFAULT_VALUES: DefaultValuesType = {
     companyId: companyId ?? "",
     description: "",
-    name: `Nouveau ${rowType}...`,
+    name: capitalizeFirstLetter(rowType),
     quantity: 1,
     quoteId,
     taxRate: TaxRate.TAX_20,
@@ -53,7 +52,7 @@ export default function AddQuoteRowButton({
     type,
     unitPrice: 1,
     order: rowsCount + 1,
-    unit: "unités",
+    unit: "unité",
     id: createId(),
   };
 
@@ -61,9 +60,7 @@ export default function AddQuoteRowButton({
     <Button
       type="button"
       variant="outline"
-      onClick={() =>
-        setValue("rows", [...rows, DEFAULT_VALUES], { shouldDirty: true })
-      }
+      onClick={() => addRow(DEFAULT_VALUES)}
     >
       {getRowTypeIcon(type)} Ajouter {rowType}
     </Button>

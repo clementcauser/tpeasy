@@ -21,7 +21,7 @@ export default function QuoteComment() {
         control={control}
         name="comment"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="ml-1">
             <FormLabel>Notes ou conditions particulières</FormLabel>
             <FormControl>
               <Textarea

@@ -19,6 +19,7 @@ export default function QuoteTable({ children }: PropsWithChildren) {
           <TableHead>Type</TableHead>
           <TableHead className="min-w-64">Nom</TableHead>
           <TableHead className="text-right min-w-16">Quantité</TableHead>
+          <TableHead className="text-right min-w-24">Unité</TableHead>
           <TableHead className="text-right min-w-32">Prix unitaire</TableHead>
           <TableHead className="text-right min-w-32">Total HT</TableHead>
           <TableHead className="text-right min-w-16">TVA</TableHead>

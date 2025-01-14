@@ -2,8 +2,8 @@
 
 import { quoteFormSchema } from "@/lib/validation/quotes";
 import { Quote, QuoteRow } from "@prisma/client";
-import { PropsWithChildren } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { Control, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { LeavingDialog } from "../misc/leaving-dialog";
 
@@ -38,12 +38,67 @@ export default function QuoteProvider({
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>{children}</form>
-      <LeavingDialog
-        enabled={form.formState.isDirty}
-        onCancel={() => console.log(form.getValues())}
-        onConfirm={() => console.log("YES")}
-      />
+      <ExtendedQuoteContextProvider control={form.control}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>{children}</form>
+        <LeavingDialog
+          enabled={form.formState.isDirty}
+          onCancel={() => console.log(form.getValues())}
+          onConfirm={() => console.log("SAVE VALUES")}
+        />
+      </ExtendedQuoteContextProvider>
     </FormProvider>
   );
 }
+
+type QuoteFieldArrayContextType = {
+  addRow: (row: QuoteRow) => void;
+  removeRow: (rowIndex: number) => void;
+  updateRow: (rowIndex: number, updatedRow: QuoteRow) => void;
+  rows: QuoteRow[];
+  catalog: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void };
+};
+
+const QuoteFieldArrayContext = createContext<QuoteFieldArrayContextType>({
+  addRow: () => ({}),
+  removeRow: () => ({}),
+  updateRow: () => ({}),
+  rows: [],
+  catalog: { isOpen: false, setIsOpen: () => {} },
+});
+
+interface ExtendedQuoteContextProviderProps {
+  control: Control<QuoteFormValues>;
+}
+
+const ExtendedQuoteContextProvider = ({
+  children,
+  control,
+}: PropsWithChildren<ExtendedQuoteContextProviderProps>) => {
+  const [catalog, setCatalog] = useState(false);
+  const { append, remove, update, fields } = useFieldArray<QuoteFormValues>({
+    name: "rows",
+    control: control,
+  });
+
+  return (
+    <QuoteFieldArrayContext.Provider
+      value={{
+        addRow: (row) =>
+          append({
+            ...row,
+            order: fields.length + 1,
+            quoteId: row?.quoteId ?? "",
+          }),
+        removeRow: (index) => remove(index),
+        updateRow: (index, row) =>
+          update(index, { ...row, quoteId: row?.quoteId ?? "" }),
+        rows: fields,
+        catalog: { isOpen: catalog, setIsOpen: setCatalog },
+      }}
+    >
+      {children}
+    </QuoteFieldArrayContext.Provider>
+  );
+};
+
+export const useExtendedQuoteContext = () => useContext(QuoteFieldArrayContext);

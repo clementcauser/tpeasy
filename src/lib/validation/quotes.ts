@@ -87,3 +87,18 @@ export const quoteFormSchema = z.object({
   title: z.string().min(1, "Champ obligatoire"),
   rows: z.array(quoteRowSchema),
 });
+
+export const changeQuoteClientSchema = z.object({
+  quoteId: z.string().cuid(),
+  clientId: z.string().cuid(),
+});
+
+export const getAllCompanyQuoteRowsSchema = z.object({
+  companyId: z.string().cuid(),
+  type: z.nativeEnum(QuoteRowType),
+});
+
+export const addQuoteRowsFromCatalogSchema = z.object({
+  quoteRowIds: z.array(z.string().cuid()),
+  quoteId: z.string().cuid(),
+});

@@ -2,7 +2,9 @@
 
 import {
   addQuoteRow,
+  changeQuoteClient,
   createQuote,
+  getAllCompanyQuoteRows,
   getAllCompanyQuotes,
   getLastQuoteReferenceId,
   getQuoteById,
@@ -12,7 +14,9 @@ import { actionClient } from "../utils/actions";
 import { incrementQuotePrefix } from "../utils/quotes";
 import {
   addQuoteRowSchema,
+  changeQuoteClientSchema,
   createQuoteSchema,
+  getAllCompanyQuoteRowsSchema,
   getAllCompanyQuotesSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
@@ -96,6 +100,36 @@ export const removeRowFromQuoteAction = actionClient
       revalidatePath(ROUTES.quoteDetails, "page");
 
       return updated;
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const changeQuoteClientAction = actionClient
+  .schema(changeQuoteClientSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const updated = await changeQuoteClient(parsedInput);
+
+      revalidatePath(ROUTES.quoteDetails, "page");
+
+      return updated;
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const getAllCompanyQuoteRowsAction = actionClient
+  .schema(getAllCompanyQuoteRowsSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const allRows = await getAllCompanyQuoteRows(parsedInput);
+
+      return allRows;
     } catch (error) {
       console.error(error);
 

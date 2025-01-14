@@ -216,7 +216,7 @@ model Quote {
 model QuoteRow {
   id        String  @id @default(cuid())
   name      String
-  unit      String  @default("unités")
+  unit      String  @default("unité")
   quantity  Float
   unitPrice Float
   taxRate   TaxRate @default(TAX_20)

@@ -4,8 +4,10 @@ import { z } from "zod";
 import { prisma } from "./prisma";
 import {
   addQuoteRowSchema,
+  changeQuoteClientSchema,
   createQuoteRowSchema,
   createQuoteSchema,
+  getAllCompanyQuoteRowsSchema,
   getAllCompanyQuotesSchema,
   getAllQuoteRowsByCompanySchema,
   getLastQuoteReferenceIdSchema,
@@ -89,4 +91,22 @@ export async function removeRowFromQuote(payload: RemoveRowFromQuotePayload) {
       console.log("Error: ", error.stack);
     }
   }
+}
+
+type ChangeQuoteClientPayload = z.infer<typeof changeQuoteClientSchema>;
+
+export async function changeQuoteClient(payload: ChangeQuoteClientPayload) {
+  return prisma.quote.update({
+    where: { id: payload.quoteId },
+    data: { clientId: payload.clientId },
+  });
+}
+
+type GetAllCompanyQuoteRows = z.infer<typeof getAllCompanyQuoteRowsSchema>;
+
+export async function getAllCompanyQuoteRows(payload: GetAllCompanyQuoteRows) {
+  return prisma.quoteRow.findMany({
+    where: { companyId: payload.companyId, type: payload.type },
+    include: { quote: true },
+  });
 }

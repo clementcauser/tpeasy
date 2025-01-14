@@ -47,7 +47,7 @@ async function Content({ companyId, quoteId }: ContentProps) {
             </QuoteTable>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <QuoteComment />
-              <QuoteClientCard client={quote.client} />
+              <QuoteClientCard quoteId={quote.id} client={quote.client} />
               <div>
                 <Button className="mt-2" type="submit">
                   <IconDeviceFloppy /> Sauvegarder

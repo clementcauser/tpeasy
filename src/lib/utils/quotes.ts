@@ -48,3 +48,13 @@ export const getQuoteTaxRateLabel = (taxRate: TaxRate) => {
 
   return DICTIONNARY[taxRate];
 };
+
+export const getTaxRateValue = (taxRate: TaxRate): number => {
+  const DICTIONNARY: Record<TaxRate, number> = {
+    [TaxRate.TAX_10]: 10,
+    [TaxRate.TAX_20]: 20,
+    [TaxRate.TAX_5_5]: 5.5,
+  };
+
+  return DICTIONNARY[taxRate];
+};
