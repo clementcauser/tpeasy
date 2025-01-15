@@ -1,5 +1,5 @@
 import { Client } from "@prisma/client";
-import QuoteClientSheet from "./quote-client-sheet";
+import { QuoteClientSheetWithButton } from "./quote-client-sheet";
 
 interface Props {
   client: Client;
@@ -13,7 +13,7 @@ export default function QuoteClientCard({ client, quoteId }: Props) {
       <div className="px-4 py-3 rounded border bg-slate-50 hover:shadow-sm transition-shadow">
         <div className="flex justify-between items-center">
           <p className="font-bold">{client.name}</p>
-          <QuoteClientSheet
+          <QuoteClientSheetWithButton
             selectedClientId={client.id}
             companyId={client.companyId}
             quoteId={quoteId}

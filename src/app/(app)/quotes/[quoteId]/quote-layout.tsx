@@ -1,6 +1,7 @@
 import { Quote } from "@prisma/client";
 import { PropsWithChildren } from "react";
 import QuoteCommand from "./quote-command";
+import QuoteTitleInput from "./quote-title-input";
 import QuoteToolbar from "./quote-toolbar";
 
 interface Props {
@@ -12,9 +13,13 @@ function QuoteLayout({ children, quote, rowsCount }: PropsWithChildren<Props>) {
   return (
     <div className="overflow-auto">
       <div className="flex justify-between gap-6 items-center">
-        <h1 className="font-bold text-2xl">{quote.title}</h1>
+        <QuoteTitleInput />
         {quote?.companyId && (
-          <QuoteCommand companyId={quote.companyId} quoteId={quote.id} />
+          <QuoteCommand
+            companyId={quote.companyId}
+            quoteId={quote.id}
+            selectedClientId={quote.clientId}
+          />
         )}
       </div>
       <p className="text-muted-foreground text-sm">{quote.referenceId}</p>

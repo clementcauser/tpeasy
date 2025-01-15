@@ -18,13 +18,11 @@ function QuoteToolbar({ companyId, quoteId, rowsCount }: QuoteToolbarProps) {
       <div className="flex items-center gap-2">
         <AddQuoteRowButton
           quoteId={quoteId}
-          companyId={companyId}
           rowsCount={rowsCount}
           type={QuoteRowType.SERVICE}
         />
         <AddQuoteRowButton
           quoteId={quoteId}
-          companyId={companyId}
           rowsCount={rowsCount}
           type={QuoteRowType.PRODUCT}
         />

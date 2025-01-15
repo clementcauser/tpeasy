@@ -1,14 +1,16 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import ROUTES from "../constants/routes";
 import {
   addQuoteRow,
   changeQuoteClient,
   createQuote,
-  getAllCompanyQuoteRows,
   getAllCompanyQuotes,
   getLastQuoteReferenceId,
   getQuoteById,
   removeRowFromQuote,
+  updateQuote,
 } from "../db/quotes";
 import { actionClient } from "../utils/actions";
 import { incrementQuotePrefix } from "../utils/quotes";
@@ -16,13 +18,11 @@ import {
   addQuoteRowSchema,
   changeQuoteClientSchema,
   createQuoteSchema,
-  getAllCompanyQuoteRowsSchema,
   getAllCompanyQuotesSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
+  updateQuoteSchema,
 } from "../validation/quotes";
-import ROUTES from "../constants/routes";
-import { revalidatePath } from "next/cache";
 
 export const getAllCompanyQuotesAction = actionClient
   .schema(getAllCompanyQuotesSchema)
@@ -123,13 +123,15 @@ export const changeQuoteClientAction = actionClient
     }
   });
 
-export const getAllCompanyQuoteRowsAction = actionClient
-  .schema(getAllCompanyQuoteRowsSchema)
+export const updateQuoteAction = actionClient
+  .schema(updateQuoteSchema)
   .action(async ({ parsedInput }) => {
     try {
-      const allRows = await getAllCompanyQuoteRows(parsedInput);
+      const updated = await updateQuote(parsedInput);
 
-      return allRows;
+      revalidatePath(ROUTES.quoteDetails, "page");
+
+      return updated;
     } catch (error) {
       console.error(error);
 

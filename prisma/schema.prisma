@@ -22,11 +22,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company        Company? @relation(fields: [companyId], references: [id])
-  companyId      String?
-  role           Role     @default(EMPLOYEE)
-  createdClients Client[]
-  createdQuotes  Quote[]
+  company             Company?     @relation(fields: [companyId], references: [id])
+  companyId           String?
+  role                Role         @default(EMPLOYEE)
+  createdClients      Client[]
+  createdQuotes       Quote[]
+  createdCatalogItems CatalogRow[]
 
   @@map("users")
 }
@@ -115,8 +116,8 @@ model Company {
   updatedAt       DateTime         @default(now()) @updatedAt
   companyFeatures CompanyFeature[]
   clients         Client[]
-  quoteRows       QuoteRow[]
   quotes          Quote[]
+  catalogRows     CatalogRow[]
 
   @@map("companies")
 }
@@ -188,19 +189,22 @@ enum TaxRate {
   TAX_20
   TAX_10
   TAX_5_5
+  TAX_0
 }
 
 model Quote {
   id             String   @id @default(cuid())
   title          String
   referenceId    String   @unique
-  createdAt      DateTime @default(now())
   expirationDate DateTime
   comment        String?
   totalET        Float    @default(0)
   totalIT        Float    @default(0)
 
   status QuoteStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   clientId    String
   client      Client     @relation(fields: [clientId], references: [id])
@@ -213,23 +217,40 @@ model Quote {
   @@map("quotes")
 }
 
+model CatalogRow {
+  id        String       @id @default(cuid())
+  name      String
+  unit      String       @default("unité")
+  unitPrice Float
+  taxRate   TaxRate      @default(TAX_20)
+  type      QuoteRowType
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   String
+  createdBy   User    @relation(fields: [createdById], references: [id])
+  createdById String
+
+  @@map("catalog_rows")
+}
+
 model QuoteRow {
   id        String  @id @default(cuid())
   name      String
   unit      String  @default("unité")
-  quantity  Float
   unitPrice Float
   taxRate   TaxRate @default(TAX_20)
+  quantity  Float
   totalET   Float // Exclude Tax (HT)
   totalIT   Float // Include Tax (TTC)
-  order     Int     @default(0)
 
-  type QuoteRowType
+  order Int          @default(0)
+  type  QuoteRowType
 
-  quote     Quote?  @relation(fields: [quoteId], references: [id])
-  quoteId   String?
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
+  quote   Quote?  @relation(fields: [quoteId], references: [id])
+  quoteId String?
 
   @@map("quote_rows")
 }

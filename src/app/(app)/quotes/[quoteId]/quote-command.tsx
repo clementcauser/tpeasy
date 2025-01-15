@@ -1,5 +1,6 @@
 "use client";
 
+import { useExtendedQuoteContext } from "@/components/providers/quote-context";
 import {
   CommandDialog,
   CommandEmpty,
@@ -8,9 +9,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { useEffect, useState } from "react";
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { capitalizeFirstLetter } from "@/lib/utils/index";
+import { getQuoteTypeLabel } from "@/lib/utils/quotes";
+import { createId } from "@paralleldrive/cuid2";
+import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import {
   IconBriefcase,
   IconDeviceFloppy,
@@ -20,15 +24,9 @@ import {
   IconSend,
   IconUser,
 } from "@tabler/icons-react";
-import { useFormContext } from "react-hook-form";
-import {
-  QuoteFormValues,
-  useExtendedQuoteContext,
-} from "@/components/providers/quote-context";
-import { getQuoteTypeLabel } from "@/lib/utils/quotes";
-import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
-import { createId } from "@paralleldrive/cuid2";
-import { capitalizeFirstLetter } from "@/lib/utils/index";
+import { useEffect, useState } from "react";
+import QuoteTitleDialog from "./quote-title-dialog";
+import QuoteClientSheet from "./quote-client-sheet";
 
 type DefaultValuesType = QuoteRow & {
   description?: string;
@@ -36,17 +34,11 @@ type DefaultValuesType = QuoteRow & {
 };
 
 const createRow =
-  (
-    quoteId: string,
-    companyId: string,
-    rowType: QuoteRowType,
-    rowsCount: number
-  ) =>
+  (quoteId: string, rowType: QuoteRowType, rowsCount: number) =>
   (addRowFn: (row: QuoteRow) => void) => {
     const type = getQuoteTypeLabel(rowType);
 
     const DEFAULT_VALUES: DefaultValuesType = {
-      companyId: companyId ?? "",
       description: "",
       name: capitalizeFirstLetter(type),
       quantity: 1,
@@ -67,13 +59,19 @@ const createRow =
 interface Props {
   quoteId: string;
   companyId: string;
+  selectedClientId: string;
 }
 
-export default function QuoteCommand({ quoteId, companyId }: Props) {
+export default function QuoteCommand({
+  quoteId,
+  companyId,
+  selectedClientId,
+}: Props) {
   const [open, setOpen] = useState(false);
-  const {} = useFormContext<QuoteFormValues>();
+  const [openTitleDialog, setOpenTitleDialog] = useState(false);
+  const [isClientSheetOpen, setIsClientSheetOpen] = useState(false);
 
-  const { addRow, rows, catalog } = useExtendedQuoteContext();
+  const { addRow, rows, catalog, submitForm } = useExtendedQuoteContext();
   const doActionAndCloseCommands = (actionFn: () => void) => {
     actionFn();
     setOpen(false);
@@ -97,7 +95,7 @@ export default function QuoteCommand({ quoteId, companyId }: Props) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-sm bg-muted text-muted-foreground hover:text-black px-3 py-1 rounded-lg border"
+        className="hidden md:block text-sm bg-muted text-muted-foreground hover:text-black px-3 py-1 rounded-lg border"
       >
         Faire une action rapide...{" "}
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
@@ -118,12 +116,7 @@ export default function QuoteCommand({ quoteId, companyId }: Props) {
             <CommandItem
               onSelect={() =>
                 doActionAndCloseCommands(() =>
-                  createRow(
-                    quoteId,
-                    companyId,
-                    QuoteRowType.SERVICE,
-                    rows.length
-                  )(addRow)
+                  createRow(quoteId, QuoteRowType.SERVICE, rows.length)(addRow)
                 )
               }
             >
@@ -132,37 +125,40 @@ export default function QuoteCommand({ quoteId, companyId }: Props) {
             <CommandItem
               onSelect={() =>
                 doActionAndCloseCommands(() =>
-                  createRow(
-                    quoteId,
-                    companyId,
-                    QuoteRowType.PRODUCT,
-                    rows.length
-                  )(addRow)
+                  createRow(quoteId, QuoteRowType.PRODUCT, rows.length)(addRow)
                 )
               }
             >
               <IconPackage /> Ajouter produit
             </CommandItem>
             <CommandItem
-              onSelect={() => {
-                doActionAndCloseCommands(() => catalog.setIsOpen(true));
-              }}
+              onSelect={() =>
+                doActionAndCloseCommands(() => catalog.setIsOpen(true))
+              }
             >
               <IconListDetails />
               Ouvrir catalogue
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Modifier">
-            <CommandItem>
+            <CommandItem
+              onSelect={() =>
+                doActionAndCloseCommands(() => setOpenTitleDialog(true))
+              }
+            >
               <IconPencil /> Changer le titre
             </CommandItem>
-            <CommandItem>
+            <CommandItem
+              onSelect={() =>
+                doActionAndCloseCommands(() => setIsClientSheetOpen(true))
+              }
+            >
               <IconUser />
               Changer de client
             </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Sauvegarder">
-            <CommandItem>
+            <CommandItem onSelect={submitForm}>
               <IconDeviceFloppy /> Sauvegarder
             </CommandItem>
             <CommandItem>
@@ -172,6 +168,18 @@ export default function QuoteCommand({ quoteId, companyId }: Props) {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
+
+      <QuoteTitleDialog
+        isOpen={openTitleDialog}
+        onOpenChange={setOpenTitleDialog}
+      />
+      <QuoteClientSheet
+        isOpen={isClientSheetOpen}
+        setIsOpen={setIsClientSheetOpen}
+        companyId={companyId}
+        quoteId={quoteId}
+        selectedClientId={selectedClientId}
+      />
     </>
   );
 }

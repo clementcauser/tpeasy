@@ -1,44 +1,22 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "./prisma";
 import {
   addQuoteRowSchema,
   changeQuoteClientSchema,
-  createQuoteRowSchema,
   createQuoteSchema,
-  getAllCompanyQuoteRowsSchema,
   getAllCompanyQuotesSchema,
-  getAllQuoteRowsByCompanySchema,
   getLastQuoteReferenceIdSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
+  updateQuoteSchema,
 } from "../validation/quotes";
-
-type CreateQuoteRowPayload = z.infer<typeof createQuoteRowSchema>;
-
-export async function createQuoteRow(payload: CreateQuoteRowPayload) {
-  return prisma.quoteRow.create({
-    data: {
-      ...payload,
-    },
-  });
-}
+import { prisma } from "./prisma";
 
 type CreateQuotePayload = z.infer<typeof createQuoteSchema>;
 
 export async function createQuote(payload: CreateQuotePayload) {
   return prisma.quote.create({ data: payload });
-}
-
-type GetAllQuoteRowsByCompanyPayload = z.infer<
-  typeof getAllQuoteRowsByCompanySchema
->;
-
-export async function getAllQuoteRowsByCompany(
-  payload: GetAllQuoteRowsByCompanyPayload
-) {
-  return prisma.quoteRow.findMany({ where: { companyId: payload.companyId } });
 }
 
 type GetAllCompanyQuotes = z.infer<typeof getAllCompanyQuotesSchema>;
@@ -102,11 +80,30 @@ export async function changeQuoteClient(payload: ChangeQuoteClientPayload) {
   });
 }
 
-type GetAllCompanyQuoteRows = z.infer<typeof getAllCompanyQuoteRowsSchema>;
+type UpdateQuotePayload = z.infer<typeof updateQuoteSchema>;
 
-export async function getAllCompanyQuoteRows(payload: GetAllCompanyQuoteRows) {
-  return prisma.quoteRow.findMany({
-    where: { companyId: payload.companyId, type: payload.type },
-    include: { quote: true },
+export async function updateQuote(payload: UpdateQuotePayload) {
+  await Promise.all(
+    payload.rows.map((row) => {
+      return prisma.quoteRow.upsert({
+        where: { id: row.id },
+        update: row,
+        create: row,
+      });
+    })
+  );
+
+  return prisma.quote.update({
+    where: { id: payload.id },
+    data: {
+      title: payload.title,
+      expirationDate: payload.expirationDate,
+      comment: payload.comment,
+      clientId: payload.clientId,
+      totalET: payload.totalET,
+      totalIT: payload.totalIT,
+      rows: { connect: payload.rows.map(({ id }) => ({ id })) },
+    },
+    include: { rows: true },
   });
 }

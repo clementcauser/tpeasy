@@ -24,24 +24,17 @@ type DefaultValuesType = QuoteRow & {
 };
 
 interface Props {
-  companyId: string;
   quoteId: string;
   type: QuoteRowType;
   rowsCount: number;
 }
 
-export default function AddQuoteRowButton({
-  companyId,
-  quoteId,
-  type,
-  rowsCount,
-}: Props) {
+export default function AddQuoteRowButton({ quoteId, type, rowsCount }: Props) {
   const rowType = getQuoteTypeLabel(type);
 
   const { addRow } = useExtendedQuoteContext();
 
   const DEFAULT_VALUES: DefaultValuesType = {
-    companyId: companyId ?? "",
     description: "",
     name: capitalizeFirstLetter(rowType),
     quantity: 1,
@@ -57,12 +50,24 @@ export default function AddQuoteRowButton({
   };
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={() => addRow(DEFAULT_VALUES)}
-    >
-      {getRowTypeIcon(type)} Ajouter {rowType}
-    </Button>
+    <>
+      <Button
+        className="hidden md:flex"
+        type="button"
+        variant="outline"
+        onClick={() => addRow(DEFAULT_VALUES)}
+      >
+        {getRowTypeIcon(type)} Ajouter {rowType}
+      </Button>
+      <Button
+        className="flex md:hidden"
+        size="icon"
+        type="button"
+        variant="outline"
+        onClick={() => addRow(DEFAULT_VALUES)}
+      >
+        {getRowTypeIcon(type)}
+      </Button>
+    </>
   );
 }

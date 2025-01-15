@@ -4,17 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getMoneyPrice } from "@/lib/utils/index";
 import { getQuoteTaxRateLabel } from "@/lib/utils/quotes";
-import { QuoteRow } from "@prisma/client";
+import { CatalogRow } from "@prisma/client";
 import { IconLoader } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface Props {
-  rows: QuoteRow[];
+  rows: CatalogRow[];
   isLoading: boolean;
+  onClose: () => void;
 }
 
-export default function QuoteCatalogRows({ rows, isLoading }: Props) {
-  const [selectedRows, setSelectedRows] = useState<QuoteRow[]>([]);
+export default function QuoteCatalogRows({ rows, isLoading, onClose }: Props) {
+  const [selectedRows, setSelectedRows] = useState<CatalogRow[]>([]);
 
   if (isLoading) {
     return (
@@ -50,7 +51,9 @@ export default function QuoteCatalogRows({ rows, isLoading }: Props) {
               ? `Ajouter ces ${selectedRows.length} éléments`
               : "Ajouter cet élément"}
           </Button>
-          <Button variant="secondary">Annuler</Button>
+          <Button variant="secondary" onClick={onClose}>
+            Annuler
+          </Button>
         </div>
       </div>
     );
@@ -58,9 +61,9 @@ export default function QuoteCatalogRows({ rows, isLoading }: Props) {
 }
 
 interface RowProps {
-  row: QuoteRow;
+  row: CatalogRow;
   isSelected: boolean;
-  onSelect: (row: QuoteRow) => void;
+  onSelect: (row: CatalogRow) => void;
 }
 
 function Row({ row, onSelect, isSelected }: RowProps) {

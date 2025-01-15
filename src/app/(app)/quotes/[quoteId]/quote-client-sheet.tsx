@@ -16,39 +16,40 @@ import { cn } from "@/lib/utils";
 import { Client } from "@prisma/client";
 import { IconLoader, IconSwitch } from "@tabler/icons-react";
 import { useAction } from "next-safe-action/hooks";
-import { useEffect, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 
 interface Props {
   companyId: string;
   selectedClientId: string;
   quoteId: string;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
 export default function QuoteClientSheet({
   companyId,
   selectedClientId,
   quoteId,
-}: Props) {
+  isOpen,
+  setIsOpen,
+  children,
+}: PropsWithChildren<Props>) {
   const [selectedClient, setSelectedClient] =
     useState<string>(selectedClientId);
-  const [open, setOpen] = useState(false);
 
   const { execute, isPending, result } = useAction(getCompanyClientsAction);
   const { execute: onClientChange, isPending: onClientChangePending } =
-    useAction(changeQuoteClientAction, { onSuccess: () => setOpen(false) });
+    useAction(changeQuoteClientAction, { onSuccess: () => setIsOpen(false) });
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       execute({ companyId });
     }
-  }, [execute, companyId, open]);
+  }, [execute, companyId, isOpen]);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
-        <IconSwitch /> Changer de client
-      </Button>
-
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      {children}
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Changement de client</SheetTitle>
@@ -71,6 +72,7 @@ export default function QuoteClientSheet({
         )}
         <SheetFooter className="flex justify-end gap-2 mt-8">
           <Button
+            className="order-2 md:order-1"
             disabled={onClientChangePending}
             type="button"
             onClick={() =>
@@ -82,6 +84,7 @@ export default function QuoteClientSheet({
           </Button>
           <SheetClose asChild>
             <Button
+              className="order-1 md:order-2"
               disabled={onClientChangePending}
               type="button"
               variant="secondary"
@@ -92,6 +95,34 @@ export default function QuoteClientSheet({
         </SheetFooter>
       </SheetContent>
     </Sheet>
+  );
+}
+
+interface QuoteClientSheetWithButtonProps {
+  companyId: string;
+  selectedClientId: string;
+  quoteId: string;
+}
+
+export function QuoteClientSheetWithButton({
+  companyId,
+  quoteId,
+  selectedClientId,
+}: QuoteClientSheetWithButtonProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <QuoteClientSheet
+      companyId={companyId}
+      quoteId={quoteId}
+      selectedClientId={selectedClientId}
+      isOpen={open}
+      setIsOpen={setOpen}
+    >
+      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
+        <IconSwitch /> Changer de client
+      </Button>
+    </QuoteClientSheet>
   );
 }
 

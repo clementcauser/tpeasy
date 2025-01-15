@@ -45,14 +45,16 @@ async function Content({ companyId, quoteId }: ContentProps) {
             <QuoteTable>
               <QuoteTableList />
             </QuoteTable>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
               <QuoteComment />
+              <div className="lg:block hidden" />
+
               <QuoteClientCard quoteId={quote.id} client={quote.client} />
-              <div>
-                <Button className="mt-2" type="submit">
-                  <IconDeviceFloppy /> Sauvegarder
-                </Button>
-              </div>
+            </div>
+            <div>
+              <Button className="mt-2" type="submit">
+                <IconDeviceFloppy /> Sauvegarder
+              </Button>
             </div>
           </QuoteLayout>
         )}

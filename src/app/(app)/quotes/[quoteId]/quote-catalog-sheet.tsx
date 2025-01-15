@@ -11,7 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getAllCompanyQuoteRowsAction } from "@/lib/actions/quotes";
+import { getCatalogItemsByTypeAction } from "@/lib/actions/catalogs";
 import { QuoteRowType } from "@prisma/client";
 import { IconListDetails } from "@tabler/icons-react";
 import { useAction } from "next-safe-action/hooks";
@@ -30,9 +30,7 @@ export default function QuoteCatalogSheet({ companyId }: Props) {
     "services"
   );
 
-  const { execute, result, isPending } = useAction(
-    getAllCompanyQuoteRowsAction
-  );
+  const { execute, result, isPending } = useAction(getCatalogItemsByTypeAction);
 
   useEffect(() => {
     if (catalog.isOpen) {
@@ -47,9 +45,19 @@ export default function QuoteCatalogSheet({ companyId }: Props) {
   return (
     <Sheet open={catalog.isOpen} onOpenChange={catalog.setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" type="button">
-          <IconListDetails /> Voir catalogue
-        </Button>
+        <div>
+          <Button className="hidden md:flex" variant="outline" type="button">
+            <IconListDetails /> Voir catalogue
+          </Button>
+          <Button
+            className="flex md:hidden"
+            variant="outline"
+            type="button"
+            size="icon"
+          >
+            <IconListDetails />
+          </Button>
+        </div>
       </SheetTrigger>
       <SheetContent className="w-full md:max-w-xl lg:max-w-2xl">
         <SheetHeader>
@@ -83,10 +91,18 @@ export default function QuoteCatalogSheet({ companyId }: Props) {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="services">
-            <QuoteCatalogRows isLoading={isPending} rows={result?.data ?? []} />
+            <QuoteCatalogRows
+              isLoading={isPending}
+              rows={result?.data ?? []}
+              onClose={() => catalog.setIsOpen(false)}
+            />
           </TabsContent>
           <TabsContent value="products">
-            <QuoteCatalogRows isLoading={isPending} rows={result?.data ?? []} />
+            <QuoteCatalogRows
+              isLoading={isPending}
+              rows={result?.data ?? []}
+              onClose={() => catalog.setIsOpen(false)}
+            />
           </TabsContent>
         </Tabs>
       </SheetContent>
