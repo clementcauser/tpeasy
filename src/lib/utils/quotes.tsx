@@ -1,4 +1,14 @@
-import { QuoteRowType, TaxRate } from "@prisma/client";
+import { QuoteRowType, QuoteStatus, TaxRate } from "@prisma/client";
+import {
+  Icon,
+  IconCheck,
+  IconClockCancel,
+  IconNotes,
+  IconProps,
+  IconSend,
+  IconX,
+} from "@tabler/icons-react";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { companyPrefixRegex } from "../constants/companies";
 
 export const buildDefaultQuotePrefix = (companyPrefix: string, date: Date) => {
@@ -60,3 +70,44 @@ export const getTaxRateValue = (taxRate: TaxRate): number => {
 
   return DICTIONNARY[taxRate];
 };
+
+type IconType = ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+
+export const getQuoteStatusData = (
+  status: QuoteStatus
+): { label: string; icon: IconType } => {
+  const DICTIONNARY: Record<
+    QuoteStatus,
+    {
+      label: string;
+      icon: IconType;
+    }
+  > = {
+    [QuoteStatus.DRAFT]: { label: "Brouillon", icon: IconNotes },
+    [QuoteStatus.PENDING]: { label: "Envoyé", icon: IconSend },
+    [QuoteStatus.ACCEPTED]: { label: "Accepté", icon: IconCheck },
+    [QuoteStatus.REJECTED]: { label: "Refusé", icon: IconX },
+    [QuoteStatus.EXPIRED]: { label: "Expiré", icon: IconClockCancel },
+  };
+
+  return DICTIONNARY[status];
+};
+
+export function getRemainingQuoteStatuses(
+  currentStatus: QuoteStatus
+): QuoteStatus[] {
+  switch (currentStatus) {
+    case QuoteStatus.DRAFT:
+      return Object.keys(QuoteStatus) as QuoteStatus[];
+
+    case QuoteStatus.PENDING:
+      return Object.keys(QuoteStatus).filter(
+        (status) => status !== QuoteStatus.DRAFT
+      ) as QuoteStatus[];
+
+    case QuoteStatus.EXPIRED:
+    case QuoteStatus.REJECTED:
+    case QuoteStatus.ACCEPTED:
+      return [];
+  }
+}

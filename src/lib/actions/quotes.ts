@@ -5,7 +5,9 @@ import ROUTES from "../constants/routes";
 import {
   addQuoteRow,
   changeQuoteClient,
+  changeQuoteStatus,
   createQuote,
+  deleteQuote,
   getAllCompanyQuotes,
   getLastQuoteReferenceId,
   getQuoteById,
@@ -17,7 +19,9 @@ import { incrementQuotePrefix } from "../utils/quotes";
 import {
   addQuoteRowSchema,
   changeQuoteClientSchema,
+  changeQuoteStatusSchema,
   createQuoteSchema,
+  deleteQuoteSchema,
   getAllCompanyQuotesSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
@@ -132,6 +136,38 @@ export const updateQuoteAction = actionClient
       revalidatePath(ROUTES.quoteDetails, "page");
 
       return updated;
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const changeQuoteStatusAction = actionClient
+  .schema(changeQuoteStatusSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      const updated = await changeQuoteStatus(parsedInput);
+
+      revalidatePath(ROUTES.quoteDetails, "page");
+
+      return updated;
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const deleteQuoteAction = actionClient
+  .schema(deleteQuoteSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      await deleteQuote(parsedInput);
+
+      revalidatePath(ROUTES.quotes, "page");
+
+      return { success: true };
     } catch (error) {
       console.error(error);
 

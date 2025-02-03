@@ -163,7 +163,7 @@ export default function QuoteCommand({
             </CommandItem>
             <CommandItem>
               <IconSend />
-              Sauvegarder et envoyer
+              Sauvegarder et envoyer au client
             </CommandItem>
           </CommandGroup>
         </CommandList>

@@ -36,6 +36,7 @@ const buildTable = (company: LightCompany) => {
     legalForm: "Forme juridique",
     rcs: "Numéro RCS",
     taxId: "Numéro TVA intracommunautaire",
+    email: "Adresse email",
   };
 
   const array = Object.keys(company);

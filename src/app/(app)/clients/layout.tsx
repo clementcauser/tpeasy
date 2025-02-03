@@ -24,7 +24,6 @@ export default function Layout({ children }: PropsWithChildren) {
         title="Mes clients"
         action={{
           type: "component",
-          label: "Ajouter un client",
           component: (
             <SheetTrigger asChild>
               <Button>

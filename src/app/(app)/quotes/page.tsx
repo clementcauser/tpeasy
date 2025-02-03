@@ -1,9 +1,8 @@
 import { getAllCompanyQuotesAction } from "@/lib/actions/quotes";
-import AppPageLayout from "../app-page-layout";
 import { auth } from "@/lib/auth";
+import AppPageLayout from "../app-page-layout";
 import CreateQuoteSheet from "./create-quote-sheet";
-import Link from "next/link";
-import ROUTES from "@/lib/constants/routes";
+import QuotesList from "./quotes-list";
 
 export default async function Page() {
   const session = await auth();
@@ -20,14 +19,9 @@ export default async function Page() {
         component: <CreateQuoteSheet />,
       }}
     >
-      {quotes?.data?.map((quote) => (
-        <Link
-          key={quote.id}
-          href={ROUTES.quoteDetails.replace("[quoteId]", quote.id)}
-        >
-          {quote.referenceId}
-        </Link>
-      ))}
+      <div className="pt-6">
+        {quotes?.data && <QuotesList quotes={quotes?.data} />}
+      </div>
     </AppPageLayout>
   );
 }

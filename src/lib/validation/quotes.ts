@@ -1,4 +1,4 @@
-import { QuoteRowType, TaxRate } from "@prisma/client";
+import { QuoteRowType, QuoteStatus, TaxRate } from "@prisma/client";
 import { z } from "zod";
 import { companyPrefixRegex } from "../constants/companies";
 
@@ -97,4 +97,13 @@ export const updateQuoteSchema = z.object({
   totalIT: z.number().min(0.01),
   title: z.string().min(1, "Champ obligatoire"),
   rows: z.array(quoteRowSchema),
+});
+
+export const deleteQuoteSchema = z.object({
+  id: z.string().cuid(),
+});
+
+export const changeQuoteStatusSchema = z.object({
+  id: z.string().cuid(),
+  status: z.nativeEnum(QuoteStatus),
 });

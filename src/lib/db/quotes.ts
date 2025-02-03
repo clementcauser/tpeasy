@@ -4,7 +4,9 @@ import { z } from "zod";
 import {
   addQuoteRowSchema,
   changeQuoteClientSchema,
+  changeQuoteStatusSchema,
   createQuoteSchema,
+  deleteQuoteSchema,
   getAllCompanyQuotesSchema,
   getLastQuoteReferenceIdSchema,
   getQuoteByIdSchema,
@@ -12,6 +14,7 @@ import {
   updateQuoteSchema,
 } from "../validation/quotes";
 import { prisma } from "./prisma";
+import { QuoteStatus } from "@prisma/client";
 
 type CreateQuotePayload = z.infer<typeof createQuoteSchema>;
 
@@ -22,7 +25,11 @@ export async function createQuote(payload: CreateQuotePayload) {
 type GetAllCompanyQuotes = z.infer<typeof getAllCompanyQuotesSchema>;
 
 export async function getAllCompanyQuotes(payload: GetAllCompanyQuotes) {
-  return prisma.quote.findMany({ where: { companyId: payload.companyId } });
+  return prisma.quote.findMany({
+    where: { companyId: payload.companyId },
+    include: { client: true },
+    orderBy: { expirationDate: "asc" },
+  });
 }
 
 type GetLastQuoteReferenceId = z.infer<typeof getLastQuoteReferenceIdSchema>;
@@ -105,5 +112,32 @@ export async function updateQuote(payload: UpdateQuotePayload) {
       rows: { connect: payload.rows.map(({ id }) => ({ id })) },
     },
     include: { rows: true },
+  });
+}
+
+type DeleteQuotePayload = z.infer<typeof deleteQuoteSchema>;
+
+export const deleteQuote = async (payload: DeleteQuotePayload) => {
+  const quote = await prisma.quote.findUnique({
+    where: { id: payload.id },
+  });
+
+  if (quote) {
+    if (quote.status !== QuoteStatus.DRAFT) {
+      return prisma.quote.delete({ where: { id: payload.id } });
+    } else {
+      throw Error("Quote status is not draft. Unable to delete.");
+    }
+  } else {
+    throw Error("Quote not found");
+  }
+};
+
+type ChangeQuoteStatusPayload = z.infer<typeof changeQuoteStatusSchema>;
+
+export async function changeQuoteStatus(payload: ChangeQuoteStatusPayload) {
+  return prisma.quote.update({
+    where: { id: payload.id },
+    data: { status: payload.status },
   });
 }

@@ -1,1 +1,1 @@
-export const APP_NAME = "TP EASY";
+export const APP_NAME = "FOCUSMART";

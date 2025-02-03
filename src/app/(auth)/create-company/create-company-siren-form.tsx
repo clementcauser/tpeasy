@@ -37,7 +37,7 @@ export default function CreateCompanySIRENForm() {
     const result = await executeAsync(values);
 
     if (!hasErrored && result?.data) {
-      setCompany(result.data);
+      setCompany({ ...result.data, email: "" });
     }
   }
 
