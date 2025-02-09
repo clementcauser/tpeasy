@@ -20,6 +20,7 @@ import {
 import {
   IconEye,
   IconLoader,
+  IconPdf,
   IconStatusChange,
   IconTrash,
 } from "@tabler/icons-react";
@@ -28,6 +29,7 @@ import { useAction } from "next-safe-action/hooks";
 import {
   changeQuoteStatusAction,
   deleteQuoteAction,
+  getAllRowsFromQuoteAction,
 } from "@/lib/actions/quotes";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -38,19 +40,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MoreHorizontal } from "lucide-react";
-import { Quote, QuoteStatus } from "@prisma/client";
+import { Client, Quote, QuoteStatus } from "@prisma/client";
 import ROUTES from "@/lib/constants/routes";
 import Link from "next/link";
 import {
   getQuoteStatusData,
   getRemainingQuoteStatuses,
 } from "@/lib/utils/quotes";
+import QuotePdfDocument from "@/components/pdf/quote.pdf";
+import { pdf } from "@react-pdf/renderer";
+import { useCurrentCompany } from "@/components/providers/company-context";
+
+type QuoteWithClient = Quote & { client: Client };
 
 interface QuoteActionsProps {
-  quote: Quote;
+  quote: QuoteWithClient;
 }
 
 export default function QuoteActions({ quote }: QuoteActionsProps) {
+  const { company } = useCurrentCompany();
+
+  const handleGeneratePdf = async () => {
+    const result = await getAllRowsFromQuoteAction({ quoteId: quote.id });
+
+    if (company && result?.data) {
+      const blob = await pdf(
+        <QuotePdfDocument
+          generatedAt={new Date(Date.now())}
+          quote={quote}
+          company={company!}
+          client={quote.client}
+          rows={result.data}
+        />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      window.open(url);
+    }
+  };
+
   return (
     <div className="text-right">
       <DropdownMenu>
@@ -69,6 +96,16 @@ export default function QuoteActions({ quote }: QuoteActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
             <ChangeStatusQuoteDialog quote={quote} />
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={(e) => {
+              e.preventDefault();
+              handleGeneratePdf();
+            }}
+          >
+            <IconPdf />
+            Exporter en PDF
           </DropdownMenuItem>
           {quote.status === QuoteStatus.DRAFT && (
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

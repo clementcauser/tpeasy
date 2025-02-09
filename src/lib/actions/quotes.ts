@@ -9,6 +9,7 @@ import {
   createQuote,
   deleteQuote,
   getAllCompanyQuotes,
+  getAllRowsFromQuote,
   getLastQuoteReferenceId,
   getQuoteById,
   removeRowFromQuote,
@@ -23,6 +24,7 @@ import {
   createQuoteSchema,
   deleteQuoteSchema,
   getAllCompanyQuotesSchema,
+  getAllRowsFromQuoteSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
   updateQuoteSchema,
@@ -168,6 +170,18 @@ export const deleteQuoteAction = actionClient
       revalidatePath(ROUTES.quotes, "page");
 
       return { success: true };
+    } catch (error) {
+      console.error(error);
+
+      throw Error(error as string);
+    }
+  });
+
+export const getAllRowsFromQuoteAction = actionClient
+  .schema(getAllRowsFromQuoteSchema)
+  .action(async ({ parsedInput }) => {
+    try {
+      return getAllRowsFromQuote(parsedInput);
     } catch (error) {
       console.error(error);
 

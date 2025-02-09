@@ -8,6 +8,7 @@ import {
   createQuoteSchema,
   deleteQuoteSchema,
   getAllCompanyQuotesSchema,
+  getAllRowsFromQuoteSchema,
   getLastQuoteReferenceIdSchema,
   getQuoteByIdSchema,
   removeRowFromQuoteSchema,
@@ -73,7 +74,7 @@ export async function removeRowFromQuote(payload: RemoveRowFromQuotePayload) {
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.log("Error: ", error.stack);
+      console.error("Error: ", error.stack);
     }
   }
 }
@@ -140,4 +141,10 @@ export async function changeQuoteStatus(payload: ChangeQuoteStatusPayload) {
     where: { id: payload.id },
     data: { status: payload.status },
   });
+}
+
+type GetAllRowsFromQuotePayload = z.infer<typeof getAllRowsFromQuoteSchema>;
+
+export async function getAllRowsFromQuote(payload: GetAllRowsFromQuotePayload) {
+  return prisma.quoteRow.findMany({ where: { quoteId: payload.quoteId } });
 }
