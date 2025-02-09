@@ -107,3 +107,7 @@ export const changeQuoteStatusSchema = z.object({
   id: z.string().cuid(),
   status: z.nativeEnum(QuoteStatus),
 });
+
+export const getAllRowsFromQuoteSchema = z.object({
+  quoteId: z.string().cuid(),
+});
