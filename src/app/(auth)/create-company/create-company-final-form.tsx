@@ -52,8 +52,6 @@ export default function CreateCompanyFinalForm({
     },
   });
 
-  console.log(form.formState.errors);
-
   const { execute, isPending } = useAction(createCompanyAction, {
     onSuccess: async (result) => {
       const companyId = result?.data?.id;

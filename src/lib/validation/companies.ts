@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { objectIdSchema } from "./common";
 
 export const createCompanyFromSIRENSchema = z
   .object({
@@ -10,7 +11,7 @@ export const createCompanyFromSIRENSchema = z
   .required();
 
 export const createCompanySchema = z.object({
-  userId: z.string().cuid(),
+  userId: objectIdSchema,
   commercialName: z.string(),
   companyPrefix: z.string().optional().or(z.string().min(3)),
   email: z.string().email(),
@@ -39,12 +40,12 @@ export const createCompanySchema = z.object({
 });
 
 export const getCurrentCompanySchema = z.object({
-  userId: z.string().cuid(),
-  companyId: z.string().cuid(),
+  userId: objectIdSchema,
+  companyId: objectIdSchema,
 });
 
 export const updateCompanyGeneralInfosSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
   email: z.string().email(),
   commercialName: z.string(),
   companyPrefix: z.string().optional().or(z.string().min(3)),
@@ -64,7 +65,7 @@ export const updateCompanyGeneralInfosSchema = z.object({
 });
 
 export const updateCompanyLegalInfosSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
   currency: z.string(),
   capital: z.string(),
   legalForm: z.string(),

@@ -12,7 +12,7 @@ import {
 import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { capitalizeFirstLetter } from "@/lib/utils/index";
 import { getQuoteTypeLabel } from "@/lib/utils/quotes";
-import { createId } from "@paralleldrive/cuid2";
+import { ObjectId } from "bson";
 import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import {
@@ -50,7 +50,7 @@ const createRow =
       unitPrice: 1,
       order: rowsCount + 1,
       unit: "unité",
-      id: createId(),
+      id: new ObjectId().toString(),
     };
 
     addRowFn(DEFAULT_VALUES);

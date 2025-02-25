@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String          @unique
   password      String?
@@ -23,7 +23,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   company             Company?     @relation(fields: [companyId], references: [id])
-  companyId           String?
+  companyId           String?      @db.ObjectId
   role                Role         @default(EMPLOYEE)
   createdClients      Client[]
   createdQuotes       Quote[]
@@ -33,16 +33,17 @@ model User {
 }
 
 model Account {
-  userId            String
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.String
+  access_token      String? @db.String
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.String
   session_state     String?
 
   createdAt DateTime @default(now())
@@ -50,13 +51,14 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
 model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   sessionToken String   @unique
-  userId       String
+  userId       String   @db.ObjectId
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -67,18 +69,19 @@ model Session {
 }
 
 model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
   token      String
   expires    DateTime
 
-  @@id([identifier, token])
+  @@unique([identifier, token])
   @@map("verification_tokens")
 }
 
 // Optional for WebAuthn support
 model Authenticator {
-  credentialID         String  @unique
-  userId               String
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
   providerAccountId    String
   credentialPublicKey  String
   counter              Int
@@ -88,12 +91,12 @@ model Authenticator {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([userId, credentialID])
+  @@unique([userId, credentialID])
   @@map("authenticators")
 }
 
 model Company {
-  id             String  @id @default(cuid())
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
   commercialName String
   companyPrefix  String?
   email          String
@@ -128,7 +131,7 @@ enum Role {
 }
 
 model Feature {
-  id          String  @id @default(cuid())
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
 
@@ -140,9 +143,9 @@ model Feature {
 }
 
 model CompanyFeature {
-  id              String  @id @default(cuid())
-  companyId       String
-  featureId       String
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyId       String  @db.ObjectId
+  featureId       String  @db.ObjectId
   isActive        Boolean @default(false)
   authorizedRoles Role[]
 
@@ -154,14 +157,14 @@ model CompanyFeature {
 }
 
 model Client {
-  id             String  @id @default(cuid())
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   address        String
   mainPhone      String
   secondaryPhone String?
   email          String
-  companyId      String
-  createdById    String
+  companyId      String  @db.ObjectId
+  createdById    String  @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -194,7 +197,7 @@ enum TaxRate {
 }
 
 model Quote {
-  id             String   @id @default(cuid())
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
   title          String
   referenceId    String   @unique
   expirationDate DateTime
@@ -207,19 +210,19 @@ model Quote {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  clientId    String
+  clientId    String     @db.ObjectId
   client      Client     @relation(fields: [clientId], references: [id])
-  createdById String
+  createdById String     @db.ObjectId
   createdBy   User       @relation(fields: [createdById], references: [id])
   rows        QuoteRow[]
   company     Company?   @relation(fields: [companyId], references: [id])
-  companyId   String?
+  companyId   String?    @db.ObjectId
 
   @@map("quotes")
 }
 
 model CatalogRow {
-  id        String       @id @default(cuid())
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   unit      String       @default("unité")
   unitPrice Float
@@ -230,15 +233,15 @@ model CatalogRow {
   updatedAt DateTime @default(now()) @updatedAt
 
   company     Company @relation(fields: [companyId], references: [id])
-  companyId   String
+  companyId   String  @db.ObjectId
   createdBy   User    @relation(fields: [createdById], references: [id])
-  createdById String
+  createdById String  @db.ObjectId
 
   @@map("catalog_rows")
 }
 
 model QuoteRow {
-  id        String  @id @default(cuid())
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   unit      String  @default("unité")
   unitPrice Float
@@ -251,7 +254,7 @@ model QuoteRow {
   type  QuoteRowType
 
   quote   Quote?  @relation(fields: [quoteId], references: [id])
-  quoteId String?
+  quoteId String? @db.ObjectId
 
   @@map("quote_rows")
 }

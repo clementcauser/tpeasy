@@ -1,28 +1,29 @@
 import { QuoteRowType, QuoteStatus, TaxRate } from "@prisma/client";
 import { z } from "zod";
 import { companyPrefixRegex } from "../constants/companies";
+import { objectIdSchema } from "./common";
 
 export const createQuoteSchema = z.object({
   referenceId: z.string().regex(companyPrefixRegex),
   expirationDate: z.date(),
   comment: z.string().optional(),
-  clientId: z.string().cuid(),
-  createdById: z.string().cuid(),
-  companyId: z.string().cuid(),
+  clientId: objectIdSchema,
+  createdById: objectIdSchema,
+  companyId: objectIdSchema,
   title: z.string().min(1, "Champ obligatoire"),
 });
 
 export const getAllCompanyQuotesSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
 });
 
 export const getLastQuoteReferenceIdSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
 });
 
 export const getQuoteByIdSchema = z.object({
-  id: z.string().cuid(),
-  companyId: z.string().cuid(),
+  id: objectIdSchema,
+  companyId: objectIdSchema,
 });
 
 export const addQuoteRowSchema = z.object({
@@ -34,16 +35,16 @@ export const addQuoteRowSchema = z.object({
   totalET: z.number().min(0.01),
   totalIT: z.number().min(0.01),
   type: z.nativeEnum(QuoteRowType),
-  quoteId: z.string().cuid(),
+  quoteId: objectIdSchema,
 });
 
 export const removeRowFromQuoteSchema = z.object({
-  rowId: z.string().cuid(),
-  quoteId: z.string().cuid(),
+  rowId: objectIdSchema,
+  quoteId: objectIdSchema,
 });
 
 const quoteRowSchema = z.object({
-  id: z.string().cuid().or(z.string().cuid2()), // This is a workaround for a bug in zod that doesn't allow both cuid and cuid2
+  id: objectIdSchema,
   name: z.string().min(1, "Champ obligatoire"),
   unit: z.string().min(1, "Champ obligatoire"),
   quantity: z.number().min(0.01),
@@ -52,18 +53,18 @@ const quoteRowSchema = z.object({
   totalET: z.number().min(0.01),
   totalIT: z.number().min(0.01),
   type: z.nativeEnum(QuoteRowType),
-  quoteId: z.string().cuid(),
+  quoteId: objectIdSchema,
   order: z.number().default(0),
 });
 
 export const quoteFormSchema = z.object({
-  id: z.string().cuid(),
+  id: objectIdSchema,
   referenceId: z.string().regex(companyPrefixRegex),
   expirationDate: z.date(),
   comment: z.string().nullable(),
-  clientId: z.string().cuid(),
-  createdById: z.string().cuid(),
-  companyId: z.string().cuid(),
+  clientId: objectIdSchema,
+  createdById: objectIdSchema,
+  companyId: objectIdSchema,
   totalET: z.number().min(0.01),
   totalIT: z.number().min(0.01),
   title: z.string().min(1, "Champ obligatoire"),
@@ -71,28 +72,28 @@ export const quoteFormSchema = z.object({
 });
 
 export const changeQuoteClientSchema = z.object({
-  quoteId: z.string().cuid(),
-  clientId: z.string().cuid(),
+  quoteId: objectIdSchema,
+  clientId: objectIdSchema,
 });
 
 export const getAllCompanyQuoteRowsSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
   type: z.nativeEnum(QuoteRowType),
 });
 
 export const addQuoteRowsFromCatalogSchema = z.object({
-  quoteRowIds: z.array(z.string().cuid()),
-  quoteId: z.string().cuid(),
+  quoteRowIds: z.array(objectIdSchema),
+  quoteId: objectIdSchema,
 });
 
 export const updateQuoteSchema = z.object({
-  id: z.string().cuid(),
+  id: objectIdSchema,
   referenceId: z.string().regex(companyPrefixRegex),
   expirationDate: z.date(),
   comment: z.string().nullable(),
-  clientId: z.string().cuid(),
-  createdById: z.string().cuid(),
-  companyId: z.string().cuid(),
+  clientId: objectIdSchema,
+  createdById: objectIdSchema,
+  companyId: objectIdSchema,
   totalET: z.number().min(0.01),
   totalIT: z.number().min(0.01),
   title: z.string().min(1, "Champ obligatoire"),
@@ -100,14 +101,14 @@ export const updateQuoteSchema = z.object({
 });
 
 export const deleteQuoteSchema = z.object({
-  id: z.string().cuid(),
+  id: objectIdSchema,
 });
 
 export const changeQuoteStatusSchema = z.object({
-  id: z.string().cuid(),
+  id: objectIdSchema,
   status: z.nativeEnum(QuoteStatus),
 });
 
 export const getAllRowsFromQuoteSchema = z.object({
-  quoteId: z.string().cuid(),
+  quoteId: objectIdSchema,
 });

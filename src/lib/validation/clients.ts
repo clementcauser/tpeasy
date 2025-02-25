@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { objectIdSchema } from "./common";
 
 export const createClientSchema = z.object({
   name: z.string().min(1, "Champ obligatoire"),
@@ -16,12 +17,12 @@ export const createClientSchema = z.object({
         .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide")
     ),
   email: z.string().email(),
-  companyId: z.string().cuid(),
-  createdById: z.string().cuid(),
+  companyId: objectIdSchema,
+  createdById: objectIdSchema,
 });
 
 export const updateClientSchema = z.object({
-  id: z.string().cuid(),
+  id: objectIdSchema,
   name: z.string().min(1, "Champ obligatoire"),
   address: z.string().min(1, "Champ obligatoire"),
   mainPhone: z
@@ -37,19 +38,19 @@ export const updateClientSchema = z.object({
         .regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide")
     ),
   email: z.string().email(),
-  companyId: z.string().cuid(),
-  createdById: z.string().cuid(),
+  companyId: objectIdSchema,
+  createdById: objectIdSchema,
 });
 
 export const getCompanyClientsSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
 });
 
 export const deleteClientSchema = z.object({
-  clientId: z.string().cuid(),
-  companyId: z.string().cuid(),
+  clientId: objectIdSchema,
+  companyId: objectIdSchema,
 });
 
 export const getCompanyClientsCountSchema = z.object({
-  companyId: z.string().cuid(),
+  companyId: objectIdSchema,
 });
