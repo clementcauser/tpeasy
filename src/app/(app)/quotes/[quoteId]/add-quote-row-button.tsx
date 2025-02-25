@@ -4,7 +4,7 @@ import { useExtendedQuoteContext } from "@/components/providers/quote-context";
 import { Button } from "@/components/ui/button";
 import { capitalizeFirstLetter } from "@/lib/utils/index";
 import { getQuoteTypeLabel } from "@/lib/utils/quotes";
-import { createId } from "@paralleldrive/cuid2";
+import { ObjectId } from "bson";
 import { QuoteRow, QuoteRowType, TaxRate } from "@prisma/client";
 import { IconBriefcase, IconPackage } from "@tabler/icons-react";
 import { ReactNode } from "react";
@@ -46,7 +46,7 @@ export default function AddQuoteRowButton({ quoteId, type, rowsCount }: Props) {
     unitPrice: 1,
     order: rowsCount + 1,
     unit: "unité",
-    id: createId(),
+    id: new ObjectId().toString(),
   };
 
   return (

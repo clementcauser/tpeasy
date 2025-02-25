@@ -90,7 +90,12 @@ export default function CreateClientForm({
     }
   );
 
-  const onSubmit = (formValues: FormValues) => execute(formValues);
+  const onSubmit = (formValues: FormValues) =>
+    execute({
+      ...formValues,
+      companyId: formValues.companyId.toString(),
+      createdById: formValues.createdById.toString(),
+    });
 
   return (
     <Form {...form}>

@@ -49,7 +49,10 @@ type GetQuoteByIdPayload = z.infer<typeof getQuoteByIdSchema>;
 
 export async function getQuoteById(payload: GetQuoteByIdPayload) {
   return prisma.quote.findFirstOrThrow({
-    where: { id: payload.id, companyId: payload.companyId },
+    where: {
+      id: payload.id.toString(),
+      companyId: payload.companyId.toString(),
+    },
     include: {
       client: true,
       rows: { orderBy: { order: "asc" } },
@@ -103,6 +106,7 @@ export async function updateQuote(payload: UpdateQuotePayload) {
 
   return prisma.quote.update({
     where: { id: payload.id },
+    include: { rows: true },
     data: {
       title: payload.title,
       expirationDate: payload.expirationDate,
@@ -112,7 +116,6 @@ export async function updateQuote(payload: UpdateQuotePayload) {
       totalIT: payload.totalIT,
       rows: { connect: payload.rows.map(({ id }) => ({ id })) },
     },
-    include: { rows: true },
   });
 }
 
