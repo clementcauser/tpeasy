@@ -83,7 +83,7 @@ export default function QuoteProvider({
 }
 
 type QuoteFieldArrayContextType = {
-  addRow: (row: QuoteRow) => void;
+  addRow: (row: Omit<QuoteRow, "id"> & { id?: QuoteRow["id"] }) => void;
   removeRow: (rowIndex: number) => void;
   updateRow: (rowIndex: number, updatedRow: QuoteRow) => void;
   rows: QuoteRow[];
@@ -116,7 +116,7 @@ const ExtendedQuoteContextProvider = ({
     control: control,
   });
 
-  const addRow = (row: QuoteRow) =>
+  const addRow = (row: Omit<QuoteRow, "id"> & { id?: QuoteRow["id"] }) =>
     append({
       ...row,
       order: fields.length + 1,

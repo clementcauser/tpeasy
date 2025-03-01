@@ -94,13 +94,19 @@ export async function changeQuoteClient(payload: ChangeQuoteClientPayload) {
 type UpdateQuotePayload = z.infer<typeof updateQuoteSchema>;
 
 export async function updateQuote(payload: UpdateQuotePayload) {
-  await Promise.all(
+  const rows = await Promise.all(
     payload.rows.map((row) => {
-      return prisma.quoteRow.upsert({
-        where: { id: row.id },
-        update: row,
-        create: row,
-      });
+      if (row?.id) {
+        const { id, ...rest } = row;
+        return prisma.quoteRow.update({
+          where: { id: id },
+          data: rest,
+        });
+      } else {
+        return prisma.quoteRow.create({
+          data: row,
+        });
+      }
     })
   );
 
@@ -114,7 +120,7 @@ export async function updateQuote(payload: UpdateQuotePayload) {
       clientId: payload.clientId,
       totalET: payload.totalET,
       totalIT: payload.totalIT,
-      rows: { connect: payload.rows.map(({ id }) => ({ id })) },
+      rows: { connect: rows.map(({ id }) => ({ id })) },
     },
   });
 }

@@ -44,7 +44,7 @@ export const removeRowFromQuoteSchema = z.object({
 });
 
 const quoteRowSchema = z.object({
-  id: objectIdSchema,
+  id: objectIdSchema.optional(),
   name: z.string().min(1, "Champ obligatoire"),
   unit: z.string().min(1, "Champ obligatoire"),
   quantity: z.number().min(0.01),

@@ -28,7 +28,7 @@ export const quotesListColumns: ColumnDef<Quote & { client: Client }>[] = [
     ),
     cell: ({ row }) => (
       <Link href={ROUTES.quoteDetails.replace("[quoteId]", row.original.id)}>
-        {row.getValue("title")}
+        <span className="text-primary">{row.getValue("title")}</span>
       </Link>
     ),
   },
