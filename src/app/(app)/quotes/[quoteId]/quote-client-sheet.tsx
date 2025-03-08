@@ -1,5 +1,6 @@
 "use client";
 
+import { useExtendedQuoteContext } from "@/components/providers/quote-context";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -109,21 +110,26 @@ export function QuoteClientSheetWithButton({
   quoteId,
   selectedClientId,
 }: QuoteClientSheetWithButtonProps) {
+  const { isEditable } = useExtendedQuoteContext();
   const [open, setOpen] = useState(false);
 
-  return (
-    <QuoteClientSheet
-      companyId={companyId}
-      quoteId={quoteId}
-      selectedClientId={selectedClientId}
-      isOpen={open}
-      setIsOpen={setOpen}
-    >
-      <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
-        <IconSwitch /> Changer de client
-      </Button>
-    </QuoteClientSheet>
-  );
+  if (isEditable) {
+    return (
+      <QuoteClientSheet
+        companyId={companyId}
+        quoteId={quoteId}
+        selectedClientId={selectedClientId}
+        isOpen={open}
+        setIsOpen={setOpen}
+      >
+        <Button type="button" variant="secondary" onClick={() => setOpen(true)}>
+          <IconSwitch /> Changer de client
+        </Button>
+      </QuoteClientSheet>
+    );
+  } else {
+    return null;
+  }
 }
 
 interface ClientListProps {

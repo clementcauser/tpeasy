@@ -110,16 +110,13 @@ export async function updateQuote(payload: UpdateQuotePayload) {
     })
   );
 
+  const { id, ...rest } = payload;
+
   return prisma.quote.update({
-    where: { id: payload.id },
+    where: { id: id },
     include: { rows: true },
     data: {
-      title: payload.title,
-      expirationDate: payload.expirationDate,
-      comment: payload.comment,
-      clientId: payload.clientId,
-      totalET: payload.totalET,
-      totalIT: payload.totalIT,
+      ...rest,
       rows: { connect: rows.map(({ id }) => ({ id })) },
     },
   });

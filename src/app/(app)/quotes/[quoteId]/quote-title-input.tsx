@@ -1,6 +1,9 @@
 "use client";
 
-import { QuoteFormValues } from "@/components/providers/quote-context";
+import {
+  QuoteFormValues,
+  useExtendedQuoteContext,
+} from "@/components/providers/quote-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
@@ -9,6 +12,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 export default function QuoteTitleInput() {
   const { setValue, getValues } = useFormContext<QuoteFormValues>();
+  const { isEditable } = useExtendedQuoteContext();
   const watchedTitle = useWatch({ name: "title" });
 
   const [showInput, setShowInput] = useState(false);
@@ -25,15 +29,18 @@ export default function QuoteTitleInput() {
       {!showInput ? (
         <>
           <h1 className="font-bold text-3xl">{watchedTitle}</h1>
-          <div>
-            <Button
-              onClick={() => setShowInput(true)}
-              className="hidden group-hover:flex"
-              size="icon"
-            >
-              <IconPencil />
-            </Button>
-          </div>
+          {isEditable && (
+            <div>
+              <Button
+                onClick={() => setShowInput(true)}
+                className="hidden group-hover:flex"
+                size="icon"
+                type="button"
+              >
+                <IconPencil />
+              </Button>
+            </div>
+          )}
         </>
       ) : (
         <>

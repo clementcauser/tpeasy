@@ -1,14 +1,15 @@
 import QuoteProvider from "@/components/providers/quote-context";
 import { getQuoteByIdAction } from "@/lib/actions/quotes";
 import { auth } from "@/lib/auth";
-import { IconDeviceFloppy, IconLoader } from "@tabler/icons-react";
+import { IconLoader } from "@tabler/icons-react";
 import { Suspense } from "react";
+import QuoteClientCard from "./quote-client-card";
+import QuoteComment from "./quote-comment";
 import QuoteLayout from "./quote-layout";
+import QuoteSaveButton from "./quote-save-button";
 import QuoteTable from "./quote-table";
 import QuoteTableList from "./quote-table-list";
-import QuoteComment from "./quote-comment";
-import QuoteClientCard from "./quote-client-card";
-import { Button } from "@/components/ui/button";
+import QuoteTaxToggle from "./quote-tax-toggle";
 
 interface PageProps {
   params: Promise<{ quoteId: string }>;
@@ -45,16 +46,17 @@ async function Content({ companyId, quoteId }: ContentProps) {
             <QuoteTable>
               <QuoteTableList />
             </QuoteTable>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-              <QuoteComment />
-              <div className="lg:block hidden" />
-
+            <div className="mt-8 mb-4">
+              <QuoteTaxToggle />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="col-span-1 md:col-span-2">
+                <QuoteComment />
+              </div>
               <QuoteClientCard quoteId={quote.id} client={quote.client} />
             </div>
             <div>
-              <Button className="mt-2" type="submit">
-                <IconDeviceFloppy /> Sauvegarder
-              </Button>
+              <QuoteSaveButton className="mt-4" />
             </div>
           </QuoteLayout>
         )}

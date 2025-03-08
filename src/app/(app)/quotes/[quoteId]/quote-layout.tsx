@@ -1,4 +1,4 @@
-import { Quote } from "@prisma/client";
+import { Quote, QuoteStatus } from "@prisma/client";
 import { PropsWithChildren } from "react";
 import QuoteCommand from "./quote-command";
 import QuoteTitleInput from "./quote-title-input";
@@ -24,7 +24,7 @@ function QuoteLayout({ children, quote, rowsCount }: PropsWithChildren<Props>) {
       </div>
       <p className="text-muted-foreground text-sm">{quote.referenceId}</p>
       <div className="py-4">
-        {quote.companyId && (
+        {quote.companyId && quote.status === QuoteStatus.DRAFT && (
           <QuoteToolbar
             companyId={quote.companyId}
             quoteId={quote.id}

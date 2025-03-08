@@ -1,10 +1,7 @@
-"use client";
-
 import { QuoteRowType } from "@prisma/client";
 import AddQuoteRowButton from "./add-quote-row-button";
 import QuoteCatalogSheet from "./quote-catalog-sheet";
-import { Button } from "@/components/ui/button";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import QuoteSaveButton from "./quote-save-button";
 
 interface QuoteToolbarProps {
   companyId: string;
@@ -28,9 +25,7 @@ function QuoteToolbar({ companyId, quoteId, rowsCount }: QuoteToolbarProps) {
         />
         <QuoteCatalogSheet companyId={companyId} />
       </div>
-      <Button type="submit">
-        <IconDeviceFloppy /> Sauvegarder
-      </Button>
+      <QuoteSaveButton />
     </div>
   );
 }

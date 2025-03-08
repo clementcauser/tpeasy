@@ -134,6 +134,7 @@ export const updateQuoteAction = actionClient
   .action(async ({ parsedInput }) => {
     try {
       const updated = await updateQuote(parsedInput);
+      console.log("🚀 ~ .action ~ updated:", updated);
 
       revalidatePath(ROUTES.quoteDetails, "page");
 

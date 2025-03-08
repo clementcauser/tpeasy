@@ -64,15 +64,57 @@ export default function QuotePdfDocument({
           generatedAt={generatedAt}
         />
         <QuoteTablePdf rows={rows} />
-        <View style={{ flex: 1, marginTop: 48 }}>
+        {quote?.isTaxFree && (
+          <Text style={[pdfCommonStyles.text, { marginVertical: 16 }]}>
+            TVA non applicable, article 293 B du CGI
+          </Text>
+        )}
+        <View style={{ flex: 1 }}>
           <Text style={[pdfCommonStyles.textBold, { marginBottom: 6 }]}>
-            Conditions générales
+            Informations additionnelles
           </Text>
           {quote.comment && (
             <Text style={pdfCommonStyles.text}>{quote.comment}</Text>
           )}
+          <View
+            style={{
+              display: "flex",
+              gap: 24,
+              flexDirection: "row",
+              marginTop: 24,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={[pdfCommonStyles.textBold, { marginBottom: 6 }]}>
+                Modalités de paiement
+              </Text>
+              {quote.comment && (
+                <Text style={pdfCommonStyles.text}>{quote.paymentTerms}</Text>
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[pdfCommonStyles.textBold, { marginBottom: 6 }]}>
+                Pénalités en cas de retard
+              </Text>
+              {quote.comment && (
+                <Text style={pdfCommonStyles.text}>{quote.latePenalties}</Text>
+              )}
+            </View>
+          </View>
         </View>
-        <View style={[pdfCommonStyles.rowBetween, { marginTop: 24 }]}>
+        <Text
+          style={[
+            pdfCommonStyles.textLight,
+            { marginVertical: 16, fontSize: 8 },
+          ]}
+        >
+          En cas de retard de paiement, seront exigibles, conformément au code
+          de commerce, une indemnité calculée sur la base de trois fois le taux
+          de l&apos;intérêt légal en vigueur ainsi qu&apos;une indemnité
+          forfaitaire pour frais de recouvrement de 40€
+        </Text>
+
+        <View style={[pdfCommonStyles.rowBetween]}>
           <View style={{ flex: 1 }} />
           <View style={{ flex: 1 }}>
             <QuoteSignaturePdf />

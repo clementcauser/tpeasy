@@ -11,7 +11,7 @@ import QuoteTableFooter from "./quote-table-footer";
 export default function QuoteTable({ children }: PropsWithChildren) {
   return (
     <Table>
-      <TableCaption>
+      <TableCaption hidden>
         Constituez votre devis en ajoutant des services et des produits.
       </TableCaption>
       <TableHeader>
