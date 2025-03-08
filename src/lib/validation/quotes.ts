@@ -2,6 +2,7 @@ import { QuoteRowType, QuoteStatus, TaxRate } from "@prisma/client";
 import { z } from "zod";
 import { companyPrefixRegex } from "../constants/companies";
 import { objectIdSchema } from "./common";
+import { is } from "date-fns/locale";
 
 export const createQuoteSchema = z.object({
   referenceId: z.string().regex(companyPrefixRegex),
@@ -44,7 +45,7 @@ export const removeRowFromQuoteSchema = z.object({
 });
 
 const quoteRowSchema = z.object({
-  id: objectIdSchema,
+  id: objectIdSchema.optional(),
   name: z.string().min(1, "Champ obligatoire"),
   unit: z.string().min(1, "Champ obligatoire"),
   quantity: z.number().min(0.01),
@@ -55,6 +56,7 @@ const quoteRowSchema = z.object({
   type: z.nativeEnum(QuoteRowType),
   quoteId: objectIdSchema,
   order: z.number().default(0),
+  description: z.string().optional(),
 });
 
 export const quoteFormSchema = z.object({
@@ -62,6 +64,8 @@ export const quoteFormSchema = z.object({
   referenceId: z.string().regex(companyPrefixRegex),
   expirationDate: z.date(),
   comment: z.string().nullable(),
+  paymentTerms: z.string().optional(),
+  latePenalties: z.string().optional(),
   clientId: objectIdSchema,
   createdById: objectIdSchema,
   companyId: objectIdSchema,
@@ -69,6 +73,7 @@ export const quoteFormSchema = z.object({
   totalIT: z.number().min(0.01),
   title: z.string().min(1, "Champ obligatoire"),
   rows: z.array(quoteRowSchema),
+  isTaxFree: z.boolean(),
 });
 
 export const changeQuoteClientSchema = z.object({
@@ -97,7 +102,10 @@ export const updateQuoteSchema = z.object({
   totalET: z.number().min(0.01),
   totalIT: z.number().min(0.01),
   title: z.string().min(1, "Champ obligatoire"),
+  latePenalties: z.string().optional(),
+  paymentTerms: z.string().optional(),
   rows: z.array(quoteRowSchema),
+  isTaxFree: z.boolean(),
 });
 
 export const deleteQuoteSchema = z.object({

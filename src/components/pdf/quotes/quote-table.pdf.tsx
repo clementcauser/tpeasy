@@ -2,6 +2,7 @@ import { Text, View, StyleSheet } from "@react-pdf/renderer";
 import { pdfCommonStyles } from "../styles";
 import { QuoteRow } from "@prisma/client";
 import QuoteTableRowPdf from "./quote-table-row.pdf";
+import { getMoneyPrice } from "@/lib/utils/index";
 
 interface Props {
   rows: QuoteRow[];
@@ -26,7 +27,7 @@ export default function QuoteTablePdf({ rows }: Props) {
       <View
         style={[
           pdfCommonStyles.rowBetween,
-          { paddingRight: 24, marginTop: 24 },
+          { paddingRight: 24, marginTop: 16 },
         ]}
       >
         <View style={{ flex: 1 }} />
@@ -34,19 +35,19 @@ export default function QuoteTablePdf({ rows }: Props) {
           <View style={[pdfCommonStyles.rowBetween, { paddingBottom: 6 }]}>
             <Text style={pdfCommonStyles.text}>Sous-total HT</Text>
             <Text style={pdfCommonStyles.text}>
-              {getValueWithDecimal(totalET)}
+              {getMoneyPrice(getValueWithDecimal(totalET))}
             </Text>
           </View>
           <View style={[pdfCommonStyles.rowBetween, { paddingBottom: 6 }]}>
             <Text style={pdfCommonStyles.text}>Montant TVA</Text>
             <Text style={pdfCommonStyles.text}>
-              {getValueWithDecimal(totalTaxes)}
+              {getMoneyPrice(getValueWithDecimal(totalTaxes))}
             </Text>
           </View>
           <View style={[pdfCommonStyles.rowBetween, { paddingBottom: 6 }]}>
             <Text style={pdfCommonStyles.textBold}>Montant total EUR</Text>
             <Text style={pdfCommonStyles.textBold}>
-              {getValueWithDecimal(totalIT)}
+              {getMoneyPrice(getValueWithDecimal(totalIT))}
             </Text>
           </View>
         </View>

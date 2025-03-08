@@ -2,7 +2,7 @@ import { QuoteRow } from "@prisma/client";
 import { StyleSheet, View, Text } from "@react-pdf/renderer";
 import { pdfCommonStyles } from "../styles";
 import { getQuoteTaxRateLabel, getQuoteTypeLabel } from "@/lib/utils/quotes";
-import { capitalizeFirstLetter } from "@/lib/utils/index";
+import { capitalizeFirstLetter, getMoneyPrice } from "@/lib/utils/index";
 
 interface Props {
   row: QuoteRow;
@@ -17,7 +17,8 @@ export default function QuoteTableRowPdf({ row }: Props) {
       <View style={styles.colTitle}>
         <Text style={pdfCommonStyles.text}>{row.name}</Text>
         <Text style={[pdfCommonStyles.textLight, { fontSize: 8 }]}>
-          {capitalizeFirstLetter(getQuoteTypeLabel(row.type))}
+          {capitalizeFirstLetter(getQuoteTypeLabel(row.type))} -{" "}
+          {row.description}
         </Text>
       </View>
       <View style={styles.col2}>
@@ -28,7 +29,7 @@ export default function QuoteTableRowPdf({ row }: Props) {
       </View>
       <View style={styles.col2}>
         <Text style={[pdfCommonStyles.text, styles.value]}>
-          {getValueWithDecimal(row.unitPrice)}
+          {getMoneyPrice(getValueWithDecimal(row.unitPrice))}
         </Text>
       </View>
       <View style={styles.colTax}>
@@ -38,7 +39,7 @@ export default function QuoteTableRowPdf({ row }: Props) {
       </View>
       <View style={styles.col2}>
         <Text style={[pdfCommonStyles.text, styles.value]}>
-          {getValueWithDecimal(row.totalET)}
+          {getMoneyPrice(getValueWithDecimal(row.totalET))}
         </Text>
       </View>
     </View>

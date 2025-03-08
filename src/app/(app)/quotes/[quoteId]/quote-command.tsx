@@ -71,7 +71,8 @@ export default function QuoteCommand({
   const [openTitleDialog, setOpenTitleDialog] = useState(false);
   const [isClientSheetOpen, setIsClientSheetOpen] = useState(false);
 
-  const { addRow, rows, catalog, submitForm } = useExtendedQuoteContext();
+  const { addRow, rows, catalog, submitForm, isSubmitting, isEditable } =
+    useExtendedQuoteContext();
   const doActionAndCloseCommands = (actionFn: () => void) => {
     actionFn();
     setOpen(false);
@@ -79,7 +80,7 @@ export default function QuoteCommand({
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "/") {
+      if (isEditable && e.key === "/") {
         e.preventDefault();
 
         setOpen((open) => !open);
@@ -88,98 +89,110 @@ export default function QuoteCommand({
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [isEditable]);
 
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="hidden md:block text-sm bg-muted text-muted-foreground hover:text-black px-3 py-1 rounded-lg border"
-      >
-        Faire une action rapide...{" "}
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">/</span>{" "}
-        </kbd>
-      </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <VisuallyHidden.Root>
-          <DialogTitle>Commandes rapides</DialogTitle>
-          <DialogDescription>
-            Menu pour accéder aux actions rapides du devis
-          </DialogDescription>
-        </VisuallyHidden.Root>
-        <CommandInput placeholder="Rechercher une commande rapide..." />
-        <CommandList>
-          <CommandEmpty>Aucun résultat</CommandEmpty>
-          <CommandGroup heading="Ajouter">
-            <CommandItem
-              onSelect={() =>
-                doActionAndCloseCommands(() =>
-                  createRow(quoteId, QuoteRowType.SERVICE, rows.length)(addRow)
-                )
-              }
-            >
-              <IconBriefcase /> Ajouter service
-            </CommandItem>
-            <CommandItem
-              onSelect={() =>
-                doActionAndCloseCommands(() =>
-                  createRow(quoteId, QuoteRowType.PRODUCT, rows.length)(addRow)
-                )
-              }
-            >
-              <IconPackage /> Ajouter produit
-            </CommandItem>
-            <CommandItem
-              onSelect={() =>
-                doActionAndCloseCommands(() => catalog.setIsOpen(true))
-              }
-            >
-              <IconListDetails />
-              Ouvrir catalogue
-            </CommandItem>
-          </CommandGroup>
-          <CommandGroup heading="Modifier">
-            <CommandItem
-              onSelect={() =>
-                doActionAndCloseCommands(() => setOpenTitleDialog(true))
-              }
-            >
-              <IconPencil /> Changer le titre
-            </CommandItem>
-            <CommandItem
-              onSelect={() =>
-                doActionAndCloseCommands(() => setIsClientSheetOpen(true))
-              }
-            >
-              <IconUser />
-              Changer de client
-            </CommandItem>
-          </CommandGroup>
-          <CommandGroup heading="Sauvegarder">
-            <CommandItem onSelect={submitForm}>
-              <IconDeviceFloppy /> Sauvegarder
-            </CommandItem>
-            <CommandItem>
-              <IconSend />
-              Sauvegarder et envoyer au client
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+  if (isEditable) {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="hidden md:block text-sm bg-muted text-muted-foreground hover:text-black px-3 py-1 rounded-lg border"
+        >
+          Faire une action rapide...{" "}
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <span className="text-xs">/</span>{" "}
+          </kbd>
+        </button>
+        <CommandDialog open={open} onOpenChange={setOpen}>
+          <VisuallyHidden.Root>
+            <DialogTitle>Commandes rapides</DialogTitle>
+            <DialogDescription>
+              Menu pour accéder aux actions rapides du devis
+            </DialogDescription>
+          </VisuallyHidden.Root>
+          <CommandInput placeholder="Rechercher une commande rapide..." />
+          <CommandList>
+            <CommandEmpty>Aucun résultat</CommandEmpty>
+            <CommandGroup heading="Ajouter">
+              <CommandItem
+                onSelect={() =>
+                  doActionAndCloseCommands(() =>
+                    createRow(
+                      quoteId,
+                      QuoteRowType.SERVICE,
+                      rows.length
+                    )(addRow)
+                  )
+                }
+              >
+                <IconBriefcase /> Ajouter service
+              </CommandItem>
+              <CommandItem
+                onSelect={() =>
+                  doActionAndCloseCommands(() =>
+                    createRow(
+                      quoteId,
+                      QuoteRowType.PRODUCT,
+                      rows.length
+                    )(addRow)
+                  )
+                }
+              >
+                <IconPackage /> Ajouter produit
+              </CommandItem>
+              <CommandItem
+                onSelect={() =>
+                  doActionAndCloseCommands(() => catalog.setIsOpen(true))
+                }
+              >
+                <IconListDetails />
+                Ouvrir catalogue
+              </CommandItem>
+            </CommandGroup>
+            <CommandGroup heading="Modifier">
+              <CommandItem
+                onSelect={() =>
+                  doActionAndCloseCommands(() => setOpenTitleDialog(true))
+                }
+              >
+                <IconPencil /> Changer le titre
+              </CommandItem>
+              <CommandItem
+                onSelect={() =>
+                  doActionAndCloseCommands(() => setIsClientSheetOpen(true))
+                }
+              >
+                <IconUser />
+                Changer de client
+              </CommandItem>
+            </CommandGroup>
+            <CommandGroup heading="Sauvegarder">
+              <CommandItem onSelect={submitForm} disabled={isSubmitting}>
+                <IconDeviceFloppy /> Sauvegarder
+              </CommandItem>
+              <CommandItem>
+                <IconSend />
+                Sauvegarder et envoyer au client
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </CommandDialog>
 
-      <QuoteTitleDialog
-        isOpen={openTitleDialog}
-        onOpenChange={setOpenTitleDialog}
-      />
-      <QuoteClientSheet
-        isOpen={isClientSheetOpen}
-        setIsOpen={setIsClientSheetOpen}
-        companyId={companyId}
-        quoteId={quoteId}
-        selectedClientId={selectedClientId}
-      />
-    </>
-  );
+        <QuoteTitleDialog
+          isOpen={openTitleDialog}
+          onOpenChange={setOpenTitleDialog}
+        />
+        <QuoteClientSheet
+          isOpen={isClientSheetOpen}
+          setIsOpen={setIsClientSheetOpen}
+          companyId={companyId}
+          quoteId={quoteId}
+          selectedClientId={selectedClientId}
+        />
+      </>
+    );
+  } else {
+    return null;
+  }
 }

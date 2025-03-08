@@ -19,11 +19,6 @@ function QuoteHeaderPdf({ company }: Props) {
         <View
           style={[pdfCommonStyles.rowBetweenCentered, styles.itemContainer]}
         >
-          <Text style={pdfCommonStyles.textLight}>{company.address}</Text>
-        </View>
-        <View
-          style={[pdfCommonStyles.rowBetweenCentered, styles.itemContainer]}
-        >
           <Text style={pdfCommonStyles.textBold}>
             n° SIRET :{" "}
             <Text style={pdfCommonStyles.textLight}>{company.siret}</Text>
@@ -36,6 +31,21 @@ function QuoteHeaderPdf({ company }: Props) {
             n° TVA UE :{" "}
             <Text style={pdfCommonStyles.textLight}>{company.taxId}</Text>
           </Text>
+        </View>
+        <View
+          style={[pdfCommonStyles.rowBetweenCentered, styles.itemContainer]}
+        >
+          <Text style={pdfCommonStyles.textBold}>
+            Code APE :{" "}
+            <Text style={pdfCommonStyles.textLight}>
+              {company.activityCode}
+            </Text>
+          </Text>
+        </View>
+        <View
+          style={[pdfCommonStyles.rowBetweenCentered, styles.itemContainer]}
+        >
+          <Text style={pdfCommonStyles.textLight}>{company.address}</Text>
         </View>
         <View
           style={[pdfCommonStyles.rowBetweenCentered, styles.itemContainer]}

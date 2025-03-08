@@ -15,11 +15,14 @@ type QuoteWithRows = Quote & { rows: QuoteRow[] };
 
 const formatDefaultValues = (quote: QuoteWithRows): QuoteFormValues => ({
   ...quote,
+  latePenalties: quote?.latePenalties ?? "",
+  paymentTerms: quote?.paymentTerms ?? "",
   companyId: quote?.companyId ?? "",
   comment: quote?.comment ?? "",
   rows: [
     ...quote.rows.map((row) => ({
       ...row,
+      ...{ description: row?.description ?? undefined },
       quoteId: row?.quoteId ?? "",
     })),
   ],
@@ -38,7 +41,7 @@ export default function QuoteProvider({
     defaultValues: formatDefaultValues(quote),
   });
 
-  const { execute } = useAction(updateQuoteAction, {
+  const { execute, isPending } = useAction(updateQuoteAction, {
     onError: () =>
       toast({
         title: "Erreur",
@@ -57,11 +60,15 @@ export default function QuoteProvider({
     },
   });
 
-  const onSubmit = (values: QuoteFormValues) => execute(values);
+  const onSubmit = (values: QuoteFormValues) => {
+    execute(values);
+  };
 
   return (
     <FormProvider {...form}>
       <ExtendedQuoteContextProvider
+        isEditable={quote.status === "DRAFT"}
+        isSubmitting={isPending}
         control={form.control}
         onSubmit={() => {
           const values = form.getValues();
@@ -83,12 +90,14 @@ export default function QuoteProvider({
 }
 
 type QuoteFieldArrayContextType = {
-  addRow: (row: QuoteRow) => void;
+  addRow: (row: Omit<QuoteRow, "id"> & { id?: QuoteRow["id"] }) => void;
   removeRow: (rowIndex: number) => void;
   updateRow: (rowIndex: number, updatedRow: QuoteRow) => void;
   rows: QuoteRow[];
   catalog: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void };
   submitForm: () => void;
+  isSubmitting: boolean;
+  isEditable: boolean;
 };
 
 const QuoteFieldArrayContext = createContext<QuoteFieldArrayContextType>({
@@ -98,27 +107,35 @@ const QuoteFieldArrayContext = createContext<QuoteFieldArrayContextType>({
   rows: [],
   catalog: { isOpen: false, setIsOpen: () => {} },
   submitForm: () => ({}),
+  isSubmitting: false,
+  isEditable: true,
 });
 
 interface ExtendedQuoteContextProviderProps {
   control: Control<QuoteFormValues>;
   onSubmit: () => void;
+  isSubmitting: boolean;
+  isEditable: boolean;
 }
 
 const ExtendedQuoteContextProvider = ({
   children,
   control,
   onSubmit,
+  isSubmitting,
+  isEditable,
 }: PropsWithChildren<ExtendedQuoteContextProviderProps>) => {
   const [catalog, setCatalog] = useState(false);
+
   const { append, remove, update, fields } = useFieldArray<QuoteFormValues>({
     name: "rows",
     control: control,
   });
 
-  const addRow = (row: QuoteRow) =>
+  const addRow = (row: Omit<QuoteRow, "id"> & { id?: QuoteRow["id"] }) =>
     append({
       ...row,
+      description: row?.description ?? "",
       order: fields.length + 1,
       quoteId: row?.quoteId ?? "",
     });
@@ -126,11 +143,20 @@ const ExtendedQuoteContextProvider = ({
   return (
     <QuoteFieldArrayContext.Provider
       value={{
-        rows: fields,
+        isEditable,
+        isSubmitting,
+        rows: fields.map((field) => ({
+          ...field,
+          description: field?.description ?? "",
+        })),
         addRow,
         removeRow: (index) => remove(index),
         updateRow: (index, row) =>
-          update(index, { ...row, quoteId: row?.quoteId ?? "" }),
+          update(index, {
+            ...row,
+            description: row?.description ?? "",
+            quoteId: row?.quoteId ?? "",
+          }),
         catalog: { isOpen: catalog, setIsOpen: setCatalog },
         submitForm: onSubmit,
       }}

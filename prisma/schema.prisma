@@ -103,7 +103,7 @@ model Company {
   siren          String  @unique
   siret          String  @unique
   category       String?
-  activityCode   String  @unique
+  activityCode   String
   address        String
   mainPhone      String
   secondaryPhone String?
@@ -201,11 +201,15 @@ model Quote {
   title          String
   referenceId    String   @unique
   expirationDate DateTime
-  comment        String?
   totalET        Float    @default(0)
   totalIT        Float    @default(0)
 
-  status QuoteStatus @default(DRAFT)
+  status    QuoteStatus @default(DRAFT)
+  isTaxFree Boolean     @default(false)
+
+  comment       String?
+  paymentTerms  String?
+  latePenalties String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -241,14 +245,15 @@ model CatalogRow {
 }
 
 model QuoteRow {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  unit      String  @default("unité")
-  unitPrice Float
-  taxRate   TaxRate @default(TAX_20)
-  quantity  Float
-  totalET   Float // Exclude Tax (HT)
-  totalIT   Float // Include Tax (TTC)
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  unit        String  @default("unité")
+  unitPrice   Float
+  taxRate     TaxRate @default(TAX_20)
+  quantity    Float
+  totalET     Float // Exclude Tax (HT)
+  totalIT     Float // Include Tax (TTC)
 
   order Int          @default(0)
   type  QuoteRowType
