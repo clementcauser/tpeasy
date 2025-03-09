@@ -2,7 +2,6 @@ import { QuoteRowType, QuoteStatus, TaxRate } from "@prisma/client";
 import { z } from "zod";
 import { companyPrefixRegex } from "../constants/companies";
 import { objectIdSchema } from "./common";
-import { is } from "date-fns/locale";
 
 export const createQuoteSchema = z.object({
   referenceId: z.string().regex(companyPrefixRegex),
